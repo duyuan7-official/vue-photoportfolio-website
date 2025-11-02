@@ -5,8 +5,10 @@ import './assets/main.css'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faTwitter,faWeixin,faQq,faTelegram } from '@fortawesome/free-brands-svg-icons'
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons' 
+import { faDownload,faShare,faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faTwitter,faWeixin,faQq,faTelegram)
+library.add(faTwitter,faWeixin,faQq,faTelegram,faHeartRegular,faDownload,faShare,faHeartSolid)
 
 const app = createApp(App)
 
