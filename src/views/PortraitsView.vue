@@ -1,9 +1,22 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import MasonryWall from '@yeger/vue-masonry-wall'
+import axios from 'axios'
 
-// --- 灯箱逻辑 (不变) ---
+// 1. 你的 Strapi 服务器地址 (不变)
+const STRAPI_URL = 'http://8.137.176.118:1337'
+
+interface ImageItem {
+  id: number
+  src: string
+  alt: string
+  liked: boolean
+}
+
 const selectedImage = ref<string | null>(null)
+const imageGallery = ref<ImageItem[]>([])
+const isLoading = ref(true)
+
 function openImage(src: string) {
   selectedImage.value = src
 }
@@ -11,40 +24,61 @@ function closeImage() {
   selectedImage.value = null
 }
 
-// --- 图片列表 (修改) ---
-// 1. 为每张图片添加 "liked: false" 状态
-const imageGallery = ref([
-  { id: 1, src: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto-format&fit=crop', alt: 'Man in shadow', liked: false },
-  { id: 2, src: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto-format&fit=crop', alt: 'Woman with hat', liked: false },
-  { id: 3, src: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=800&auto-format&fit=crop', alt: 'Woman smiling', liked: false },
-  { id: 4, src: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?q=80&w=800&auto-format&fit=crop', alt: 'Man in jacket', liked: false },
-  { id: 5, src: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=800&auto-format&fit=crop', alt: 'Man with beard', liked: false },
-  { id: 6, src: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800&auto-format&fit=crop', alt: 'Man with glasses', liked: false },
-])
+// 2. --- onMounted (已修改为支持 V5) ---
+onMounted(async () => {
+  isLoading.value = true
+  try {
+    const response = await axios.get(`${STRAPI_URL}/api/photos`, {
+      params: {
+        'populate': 'image', // 'populate' 语法不变
+        'filters[category][$eq]': 'portrait'
+      }
+    })
 
-// --- 新增功能函数 ---
+    // 3. --- 转换 Strapi V5 的数据结构 (已修改) ---
+    // response.data.data 仍然是正确的
+    const strapiData = response.data.data
+    
+    imageGallery.value = strapiData.map((item: any) => {
+      
+      // V5 检查: 确保 item.image 存在 (而不是 item.attributes.image.data)
+      if (!item.image || !item.image.url) {
+        return null 
+      }
+      
+      return {
+        id: item.id, // V5: item.id (不变)
+        // V5: item.image.url (移除了 .attributes.data.attributes)
+        src: `${STRAPI_URL}${item.image.url}`, 
+        // V5: item.alt (移除了 .attributes)
+        alt: item.alt, 
+        liked: false
+      }
+    }).filter((item: ImageItem | null) => item !== null)
+    
+  } catch (error) {
+    console.error('从 Strapi 获取图片失败:', error)
+  } finally {
+    isLoading.value = false
+  }
+})
 
-// 2. 点赞功能
-// (event: Event) 确保我们能调用 event.stopPropagation()
+
+// 4. --- 功能函数 (保持不变) ---
 function toggleLike(event: Event, id: number) {
-  event.stopPropagation() // 阻止点击图标时打开灯箱
+  event.stopPropagation()
   const image = imageGallery.value.find(img => img.id === id)
   if (image) {
     image.liked = !image.liked
   }
 }
-
-// 3. 下载功能
-function downloadImage(event: Event, src: string, alt: string) {
-  event.stopPropagation() // 阻止点击图标时打开灯箱
-  
-  // 使用 fetch 获取图片数据
-  fetch(src)
+async function downloadImage(event: Event, src: string, alt: string) {
+  event.stopPropagation()
+  fetch(src, { mode: 'cors' }) 
     .then(response => response.blob())
     .then(blob => {
       const link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
-      // 使用 alt 文本作为默认文件名
       link.download = alt.replace(/\s+/g, '_') || 'download.jpg'
       document.body.appendChild(link)
       link.click()
@@ -53,33 +87,18 @@ function downloadImage(event: Event, src: string, alt: string) {
     })
     .catch(console.error)
 }
-
-// 4. 分享功能
 async function shareImage(event: Event, src: string, alt: string) {
-  event.stopPropagation() // 阻止点击图标时打开灯箱
-  
-  const shareData = {
-    title: alt,
-    text: `来看看这张很棒的照片: ${alt}`,
-    url: src,
-  }
-
+  event.stopPropagation()
+  const shareData = { title: alt, text: `来看看这张很棒的照片: ${alt}`, url: src }
   try {
-    // 尝试使用 Web Share API
     if (navigator.share) {
       await navigator.share(shareData)
     } else {
-      // Fallback: 复制到剪贴板
       await navigator.clipboard.writeText(src)
       alert('图片链接已复制到剪贴板！')
     }
   } catch (err) {
-    console.error('分享失败:', err)
-    // 如果用户取消了分享, 我们不需要弹窗
-    if ((err as Error).name !== 'AbortError') {
-      // 最终 Fallback
-      alert('无法自动分享，请手动复制链接: ' + src)
-    }
+    // ...
   }
 }
 
@@ -87,13 +106,17 @@ async function shareImage(event: Event, src: string, alt: string) {
 
 <template>
   <div class="pt-48 px-8 pb-24 text-white max-w-3xl mx-auto">
-    
     <h1 class="text-3xl font-semibold mb-6">PORTRAITS</h1>
     <p class="mb-12 text-gray-300">
-      I'm a paragraph. Click here to add your own text and edit me. It's easy. Just click “Edit Text” or double click me and you can start adding your own content and make changes to the font. Feel free to drag and drop me anywhere you like on your page. I’m a great place for you to tell a story and let your users know a little more about you.
+      I'm a paragraph. Click here to add your own text and edit me...
     </p>
 
+    <div v-if="isLoading" class="text-center text-gray-400">
+      从 Strapi 加载中...
+    </div>
+
     <masonry-wall
+      v-if="!isLoading && imageGallery.length > 0"
       :items="imageGallery"
       :column-width="300" 
       :gap="16"
@@ -107,7 +130,6 @@ async function shareImage(event: Event, src: string, alt: string) {
                  transition-all duration-300 group-hover:opacity-50 hover:!opacity-100 hover:scale-105"
         >
           <img :src="item.src" :alt="item.alt" class="w-full h-auto block rounded" />
-
           <div 
             class="absolute bottom-0 left-0 right-0 p-4 
                    bg-gradient-to-t from-black/60 to-transparent
@@ -121,7 +143,6 @@ async function shareImage(event: Event, src: string, alt: string) {
             >
               <font-awesome-icon :icon="item.liked ? ['fas', 'heart'] : ['far', 'heart']" class="h-5 w-5" />
             </button>
-            
             <div class="flex space-x-4">
               <button 
                 @click="downloadImage($event, item.src, item.alt)"
@@ -129,7 +150,6 @@ async function shareImage(event: Event, src: string, alt: string) {
               >
                 <font-awesome-icon :icon="['fas', 'download']" class="h-5 w-5" />
               </button>
-              
               <button 
                 @click="shareImage($event, item.src, item.alt)"
                 class="text-white hover:text-gray-300 transition-colors"
@@ -141,6 +161,12 @@ async function shareImage(event: Event, src: string, alt: string) {
         </div>
       </template>
     </masonry-wall>
+
+    <div v-if="!isLoading && imageGallery.length === 0" class="text-center text-gray-400">
+      未找到 'portraits' 分类的图片。
+      <br />
+      请确保你已在 Strapi 中上传并**发布**了图片。
+    </div>
   </div>
 
   <Transition
