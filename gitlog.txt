@@ -1,0 +1,107 @@
+*   commit 3792df3903282bceabfbc5b676ded9278ce89c5e
+|\  Merge: 36d28a8 e250ac5
+| | Author: duyuan7-official <duyuan7.official@gmail.com>
+| | Date:   Mon Nov 3 18:46:50 2025 +0800
+| | 
+| |     Merge pull request #6 from duyuan7-official/dev
+| |     
+| |     Dev分支合并到Main
+| | 
+| * commit e250ac53ba08f107c57c881c2b5c2cc1d6b4dcab
+| | Author: duyuan7-official <duyuan7.official@gmail.com>
+| | Date:   Mon Nov 3 18:41:45 2025 +0800
+| | 
+| |     删除JourneyDetailView无用页面
+| |   
+| *   commit 55855516ac9f13fdbd1973c6980480b40f1fef82
+| |\  Merge: 079f722 bd452b7
+| | | Author: duyuan7-official <duyuan7.official@gmail.com>
+| | | Date:   Mon Nov 3 18:26:59 2025 +0800
+| | | 
+| | |     Merge pull request #5 from duyuan7-official/feature/journey-view
+| | |     
+| | |     实现Journey页面和旅程相册页面，更用js实现图片悬停：更加清晰明确的图片状态管理，修复显示bug
+| | | 
+| | * commit bd452b7e334b732010af3b9007ec7996bc880212
+| |/  Author: duyuan7-official <duyuan7.official@gmail.com>
+| |   Date:   Mon Nov 3 18:09:00 2025 +0800
+| |   
+| |       实现Journey页面和旅程相册页面，更用js实现图片悬停：更加清晰明确的图片状态管理，修复显示bug
+| |   
+| *   commit 079f7224e8aa1d5e56a1dc64b238541ace91bce9
+| |\  Merge: bdf3dda e24e791
+| | | Author: duyuan7-official <duyuan7.official@gmail.com>
+| | | Date:   Mon Nov 3 14:43:16 2025 +0800
+| | | 
+| | |     Merge pull request #4 from duyuan7-official/feature/landscape-view
+| | |     
+| | |     修改完成Landscape页面
+| | | 
+| | * commit e24e791a1099a132d22a16adb885d350a109b149
+| |/  Author: duyuan7-official <duyuan7.official@gmail.com>
+| |   Date:   Mon Nov 3 14:41:34 2025 +0800
+| |   
+| |       修改完成Landscape页面
+| | 
+* | commit 36d28a89eb1264b30e79b08371c246b845b1046a
+|\| Merge: 9832696 bdf3dda
+| | Author: duyuan7-official <duyuan7.official@gmail.com>
+| | Date:   Mon Nov 3 01:37:23 2025 +0800
+| | 
+| |     Merge pull request #3 from duyuan7-official/dev
+| |     
+| |     Feature
+| | 
+| * commit bdf3ddae58611a96e8343b3cb94e3a6a2940cd26
+| | Author: duyuan7-official <duyuan7.official@gmail.com>
+| | Date:   Mon Nov 3 01:09:41 2025 +0800
+| | 
+| |     采用strapi后端框架管理图片和文章资源，portraits页面实现通过api获取资源
+| |   
+| *   commit 56a55506f3c362e73db2ae32c62f6dd7ea3277c8
+| |\  Merge: 5045d0c 9832696
+| |/  Author: duyuan7-official <duyuan7.official@gmail.com>
+|/|   Date:   Mon Nov 3 01:15:41 2025 +0800
+| |   
+| |       Merge pull request #2 from duyuan7-official/main
+| |       
+| |       Merge pull request #1 from duyuan7-official/dev
+| | 
+* | commit 9832696bd8cea1ced32b6ff841e0e037849574c8
+|\| Merge: e3c178f 5045d0c
+| | Author: duyuan7-official <duyuan7.official@gmail.com>
+| | Date:   Mon Nov 3 01:13:48 2025 +0800
+| | 
+| |     Merge pull request #1 from duyuan7-official/dev
+| |     
+| |     Dev
+| | 
+| * commit 5045d0cca9a4816a85a2a550ae678a5f6973ea63
+| | Author: duyuan7-official <duyuan7.official@gmail.com>
+| | Date:   Sun Nov 2 19:30:40 2025 +0800
+| | 
+| |     初步实现 View 页面-瀑布流展示、动态响应页面、图片预览和基础功能。TODO：接入后端，从后端获取所有图片数据
+| | 
+| * commit 7b62d10cda402e2ac9dfbde2455bb8c7139b6314
+|/  Author: duyuan7-official <duyuan7.official@gmail.com>
+|   Date:   Sat Nov 1 22:48:12 2025 +0800
+|   
+|       完善About页面与页脚，修改图标样式
+| 
+* commit e3c178f34f01355e338072a8b23d19b8c1969d93
+| Author: duyuan7-official <duyuan7.official@gmail.com>
+| Date:   Sat Nov 1 13:30:24 2025 +0800
+| 
+|     feat: 实现路由，Home页面，Footer和Header导航栏
+| 
+* commit bb69f29a7cd3ae35458c4157090aa62b2466c703
+| Author: duyuan7-official <duyuan7.official@gmail.com>
+| Date:   Sat Nov 1 13:17:15 2025 +0800
+| 
+|     feat: 实现路由，Home页面，Footer和Header导航栏
+| 
+* commit e76cea0ae6fd0c52752de6e938e7105b31b9f226
+  Author: duyuan7-official <duyuan7.official@gmail.com>
+  Date:   Fri Oct 31 10:07:03 2025 +0800
+  
+      Initial commit for vue-photoportfolio-website

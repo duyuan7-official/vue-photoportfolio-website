@@ -5,7 +5,9 @@ import PortraitsView from '../views/PortraitsView.vue'
 import LandscapeView from '../views/LandscapeView.vue'
 import JourneyView from '../views/JourneyView.vue'
 //import JourneyDetailView from '../views/JourneyDetailView.vue'
-import BlogView from '../views/BlogView.vue'
+import ArticleView from '../views/ArticleView.vue'
+import ArticleDetailView from '@/views/ArticleDetailView.vue'
+
 
 const routes = [
   { path: '/', name: 'Home', component: HomeView },
@@ -18,7 +20,12 @@ const routes = [
   //  name: 'JourneyDetail',
   //  component: JourneyDetailView
   //},
-  { path: '/blog', name: 'Blog', component: BlogView },
+  { path: '/article', name: 'Blog', component: ArticleView },
+  { 
+    path: '/article/:slug',
+    name: 'ArticleDetail',
+    component: ArticleDetailView
+  }
 ]
 
 const router = createRouter({
