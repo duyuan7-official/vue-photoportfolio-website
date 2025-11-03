@@ -61,7 +61,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="pt-48 px-8 pb-24 text-white max-w-5xl mx-auto">
+  <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
     
     <h1 class="text-3xl font-semibold mb-2">CLIENTS</h1>
     <p class="mb-12 text-gray-300">
