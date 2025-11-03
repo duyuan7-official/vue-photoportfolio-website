@@ -3,7 +3,8 @@ import HomeView from '../views/HomeView.vue'
 import AboutView from '../views/AboutView.vue'
 import PortraitsView from '../views/PortraitsView.vue'
 import LandscapeView from '../views/LandscapeView.vue'
-import AlbumsView from '../views/AlbumsView.vue'
+import JourneyView from '../views/JourneyView.vue'
+//import JourneyDetailView from '../views/JourneyDetailView.vue'
 import BlogView from '../views/BlogView.vue'
 
 const routes = [
@@ -11,7 +12,12 @@ const routes = [
   { path: '/about', name: 'About', component: AboutView },
   { path: '/portraits', name: 'Portraits', component: PortraitsView },
   { path: '/landscape', name: 'Landscape', component: LandscapeView },
-  { path: '/albums', name: 'Albums', component: AlbumsView },
+  { path: '/journey', name: 'Journey', component: JourneyView },
+  //{ 
+  //  path: '/journey/:slug',
+  //  name: 'JourneyDetail',
+  //  component: JourneyDetailView
+  //},
   { path: '/blog', name: 'Blog', component: BlogView },
 ]
 

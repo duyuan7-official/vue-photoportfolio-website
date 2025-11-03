@@ -13,6 +13,7 @@ interface ImageItem {
   liked: boolean
 }
 
+const hoveredItemId = ref<number | null>(null) // --- (新增) 用于跟踪被悬停的图片 ID ---
 const selectedImage = ref<string | null>(null)
 const imageGallery = ref<ImageItem[]>([])
 const isLoading = ref(true)
@@ -99,7 +100,7 @@ async function shareImage(event: Event, src: string, alt: string) {
 </script>
 
 <template>
-  <div class="pt-32 px-8 pb-24 text-white max-w-3xl mx-auto">
+  <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
     
     <h1 class="text-3xl font-semibold mb-6">LANDSCAPE</h1>
     <p class="mb-12 text-gray-300">
@@ -115,21 +116,30 @@ async function shareImage(event: Event, src: string, alt: string) {
       :items="imageGallery"
       :column-width="300" 
       :gap="16"
-      class="group"
+      @mouseleave="hoveredItemId = null"
     >
       <template #default="{ item }">
         <div 
           :key="item.id"
+          @mouseenter="hoveredItemId = item.id"
+          @mouseleave="hoveredItemId = null"
           @click="openImage(item.src)"
-          class="relative cursor-pointer 
-                 transition-all duration-300 group-hover:opacity-50 hover:!opacity-100 hover:scale-105"
+          class="relative cursor-pointer group/item"
+          :class="[
+            'transition-all duration-300',
+            hoveredItemId === null
+              ? 'opacity-100 scale-100' /* 状态A: 无悬停 */
+              : hoveredItemId === item.id
+                ? 'opacity-100 scale-105 z-10' /* 状态B: 这张被悬停 */
+                : 'opacity-50 scale-100'  /* 状态C: 别的被悬停 */
+          ]"
         >
           <img :src="item.src" :alt="item.alt" class="w-full h-auto block rounded" />
           <div 
             class="absolute bottom-0 left-0 right-0 p-4 
                    bg-gradient-to-t from-black/60 to-transparent
                    flex justify-between items-center
-                   opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                   opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"
           >
             <button 
               @click="toggleLike($event, item.id)"

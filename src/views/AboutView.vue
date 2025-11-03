@@ -4,7 +4,7 @@
 </script>
 
 <template>
-  <div class="pt-32 px-8 pb-24 text-white max-w-3xl mx-auto">
+  <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
     
     <h1 class="text-3xl font-semibold mb-6">About us</h1>
     <p class="mb-4 text-gray-300">
