@@ -4,7 +4,7 @@ import { RouterLink } from 'vue-router'
 
 <template>
   <header class="absolute top-0 left-0 right-0 z-10 p-8 text-white">
-    <div class="container max-w-3xl mx-auto flex items-center space-x-6">
+    <div class="container max-w-4xl mx-auto flex items-center space-x-6">
       
       <RouterLink to="/" class="flex-shrink-0">
         <span class="block font-semibold text-lg tracking-wider">Du Yuan</span>
@@ -33,12 +33,12 @@ import { RouterLink } from 'vue-router'
           
           <li class="flex-1 text-center transition-opacity duration-300 hover:opacity-50 group">
             <div class="h-0.5 bg-white mb-1 transition-all duration-300 group-hover:h-px"></div>
-            <RouterLink to="/documentary" class="uppercase text-xs tracking-widest">Documentary</RouterLink>
+            <RouterLink to="/landscape" class="uppercase text-xs tracking-widest">Landscape</RouterLink>
           </li>
           
           <li class="flex-1 text-center transition-opacity duration-300 hover:opacity-50 group">
             <div class="h-0.5 bg-white mb-1 transition-all duration-300 group-hover:h-px"></div>
-            <RouterLink to="/albums" class="uppercase text-xs tracking-widest">Albums</RouterLink>
+            <RouterLink to="/journey" class="uppercase text-xs tracking-widest">Journey</RouterLink>
           </li>
           
           <li class="flex-1 text-center transition-opacity duration-300 hover:opacity-50 group">
