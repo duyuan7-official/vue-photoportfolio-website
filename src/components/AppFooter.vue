@@ -1,6 +1,6 @@
 <template>
   <div class="absolute bottom-0 left-0 right-0 p-8 text-gray-400">
-    <div class="container max-w-3xl mx-auto flex justify-between items-center text-xs">
+    <div class="container max-w-5xl mx-auto flex justify-between items-center text-xs">
       
       <p class="text-gray-500">
         © 2035 by DuYuan&HeShan PHOTOGRAPHY. Powered and secured by DuYuan

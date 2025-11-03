@@ -3,68 +3,67 @@ import { ref, onMounted } from 'vue'
 import MasonryWall from '@yeger/vue-masonry-wall'
 import axios from 'axios'
 
-// 1. 你的 Strapi 服务器地址 (不变)
-const STRAPI_URL = 'http://8.137.176.118:1337'
+// --- 
+// 1. (新增) JS 状态, 用于跟踪被悬停的图片 ID
+// ---
+const hoveredItemId = ref<number | null>(null)
+// --- 1. 定义 Props ---
+// 这个组件现在通过 'slug' prop 接收它需要获取的数据
+const props = defineProps<{
+  slug: string
+}>()
+
+// --- 2. (重要!) 移除所有路由相关的代码 (useRoute) ---
+
+const STRAPI_URL = 'http://8.137.176.118:1337' // 确保这是你的正确 IP
 
 interface ImageItem {
-  id: number
-  src: string
-  alt: string
-  liked: boolean
+  id: number, src: string, alt: string, liked: boolean
 }
-const hoveredItemId = ref<number | null>(null) // --- (新增) 用于跟踪被悬停的图片 ID ---
+
+// (灯箱和瀑布流的 <script> 逻辑完全不变)
 const selectedImage = ref<string | null>(null)
 const imageGallery = ref<ImageItem[]>([])
 const isLoading = ref(true)
+const journeyTitle = ref('') 
 
-function openImage(src: string) {
-  selectedImage.value = src
-}
-function closeImage() {
-  selectedImage.value = null
-}
+function openImage(src: string) { selectedImage.value = src }
+function closeImage() { selectedImage.value = null }
 
-// 2. --- onMounted (已修改为支持 V5) ---
 onMounted(async () => {
   isLoading.value = true
   try {
-    const response = await axios.get(`${STRAPI_URL}/api/photos`, {
+    const response = await axios.get(`${STRAPI_URL}/api/journeys`, {
       params: {
-        'populate': 'image', // 'populate' 语法不变
-        'filters[category][$eq]': 'portrait'
+        // --- 3. (重要!) 使用 props.slug ---
+        'filters[slug][$eq]': props.slug, 
+        'populate[photos][populate]': 'image' 
       }
     })
 
-    // 3. --- 转换 Strapi V5 的数据结构 (已修改) ---
-    // response.data.data 仍然是正确的
-    const strapiData = response.data.data
-    
-    imageGallery.value = strapiData.map((item: any) => {
-      
-      // V5 检查: 确保 item.image 存在 (而不是 item.attributes.image.data)
-      if (!item.image || !item.image.url) {
-        return null 
-      }
-      
+    const journeyData = response.data.data[0] 
+    if (!journeyData) throw new Error('未找到旅程')
+
+    journeyTitle.value = journeyData.title 
+
+    imageGallery.value = journeyData.photos.map((item: any) => {
+      if (!item.image || !item.image.url) return null
       return {
-        id: item.id, // V5: item.id (不变)
-        // V5: item.image.url (移除了 .attributes.data.attributes)
+        id: item.id,
         src: `${STRAPI_URL}${item.image.url}`, 
-        // V5: item.alt (移除了 .attributes)
         alt: item.alt, 
         liked: false
       }
     }).filter((item: ImageItem | null) => item !== null)
     
   } catch (error) {
-    console.error('从 Strapi 获取图片失败:', error)
+    console.error('从 Strapi 获取旅程详情失败:', error)
   } finally {
     isLoading.value = false
   }
 })
 
-
-// 4. --- 功能函数 (保持不变) ---
+// --- (所有功能函数 toggleLike, downloadImage, shareImage 保持不变) ---
 function toggleLike(event: Event, id: number) {
   event.stopPropagation()
   const image = imageGallery.value.find(img => img.id === id)
@@ -101,18 +100,14 @@ async function shareImage(event: Event, src: string, alt: string) {
     // ...
   }
 }
-
 </script>
 
 <template>
-  <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
-    <h1 class="text-3xl font-semibold mb-6">PORTRAITS</h1>
-    <p class="mb-12 text-gray-300">
-      人像摄影作品集。点击图片查看大图，喜欢的话可以点赞、下载或分享给朋友！
-    </p>
-
+  <div>
+    <h1 class="text-3xl font-semibold mb-6 text-white">{{ journeyTitle || '加载中...' }}</h1>
+    
     <div v-if="isLoading" class="text-center text-gray-400">
-      从 Strapi 加载中...
+      加载中...
     </div>
 
     <masonry-wall
@@ -125,9 +120,9 @@ async function shareImage(event: Event, src: string, alt: string) {
       <template #default="{ item }">
         <div 
           :key="item.id"
+          @click="openImage(item.src)"
           @mouseenter="hoveredItemId = item.id"
           @mouseleave="hoveredItemId = null"
-          @click="openImage(item.src)"
           class="relative cursor-pointer group/item"
           :class="[
             'transition-all duration-300',
@@ -137,8 +132,9 @@ async function shareImage(event: Event, src: string, alt: string) {
                 ? 'opacity-100 scale-105 z-10' /* 状态B: 这张被悬停 */
                 : 'opacity-50 scale-100'  /* 状态C: 别的被悬停 */
           ]"
-                 >
+        >
           <img :src="item.src" :alt="item.alt" class="w-full h-auto block rounded" />
+
           <div 
             class="absolute bottom-0 left-0 right-0 p-4 
                    bg-gradient-to-t from-black/60 to-transparent
@@ -172,9 +168,7 @@ async function shareImage(event: Event, src: string, alt: string) {
     </masonry-wall>
 
     <div v-if="!isLoading && imageGallery.length === 0" class="text-center text-gray-400">
-      未找到 'portraits' 分类的图片。
-      <br />
-      请确保你已在 Strapi 中上传并**发布**了图片。
+      这个旅程中还没有照片。
     </div>
   </div>
 
