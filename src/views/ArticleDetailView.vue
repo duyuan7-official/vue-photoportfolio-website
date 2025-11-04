@@ -197,7 +197,7 @@ async function handleCommentSubmit() {
         })
 
         //实时更新评论
-        const newComment = response.data
+        const newComment = response.data.data
         // (为了安全, 格式化一下)
         const formattedComment = {
         id: newComment.id,
@@ -218,6 +218,20 @@ async function handleCommentSubmit() {
     }
 }
 
+// --- ( ✨ 2. 新增! 精确的时间格式化函数 ✨ ) ---
+function formatPreciseDate(dateString: string) {
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false // 使用24小时制
+  };
+  return new Date(dateString).toLocaleString('zh-CN', options);
+}
+
 </script>
 
 <template>
@@ -230,90 +244,35 @@ async function handleCommentSubmit() {
     <article v-if="post">
       
       <header class="mb-8">
-        <div class="text-gray-400 text-sm flex items-center space-x-2">
-          <span v-if="post.date">{{ post.date }}</span>
-          <span v-if="post.date && post.read_time_minutes" class="mx-1">•</span>
-          <span v-if="post.read_time_minutes">{{ post.read_time_minutes }} 分钟阅读</span>
-        </div>
-        
         <h1 class="text-4xl md:text-5xl font-bold text-left my-4">
           {{ post.title }}
         </h1>
-        
-        <div class="text-gray-500 text-sm">
-          已更新: {{ post.updatedAt }}
-        </div>
-      </header>
-
+        </header>
       <div 
         v-html="renderedContent"
         class="prose prose-invert prose-lg max-w-3xl border-b mx-auto"
       ></div>
-
-      <div class="flex space-x-4 py-8 border-b border-gray-700">
-        <a 
-            href="#" 
-            @click.prevent="shareToQQ"
-            class="text-gray-400 hover:text-white" 
-            title="分享到 QQ">
-          <font-awesome-icon :icon="['fab', 'qq']" class="h-5 w-5" />
-        </a>
-        <a href="#" 
-            @click.prevent="shareOnXTwitter"
-            class="text-gray-400 hover:text-white"
-            title="分享到 Twitter"
-            >
-          <font-awesome-icon :icon="['fab', 'x-twitter']" class="h-5 w-5" />
-        </a>
-        <a href="#" @click.prevent="shareOnLinkedIn" class="text-gray-400 hover:text-white" title="分享到 LinkedIn">
-          <font-awesome-icon :icon="['fab', 'linkedin']" class="h-5 w-5" />
-        </a>
-        <a href="#" class="text-gray-400 hover:text-white" title="复制链接">
-          <font-awesome-icon :icon="['fas', 'link']" class="h-5 w-5" />
-        </a>
-      </div>
-
+      <div class="flex space-x-4 py-8 border-b border-transparent">
+        </div>
       <section class="mt-12" v-if="recentPosts.length > 0">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-semibold">最新文章</h2>
-          <RouterLink to="/article" class="text-sm text-gray-400 hover:text-white">
-            查看全部
-          </RouterLink>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <RouterLink 
-            v-for="recent in recentPosts" 
-            :key="recent.id"
-            :to="{ name: 'ArticleDetail', params: { slug: recent.slug } }"
-            class="block group"
-          >
-            <div class="aspect-video overflow-hidden">
-              <img 
-                :src="recent.coverImageUrl" 
-                :alt="recent.title" 
-                class="w-full h-full object-cover 
-                       transition-transform duration-500 ease-in-out group-hover:scale-105"
-              />
-            </div>
-            <h3 class="mt-3 text-lg font-semibold group-hover:text-gray-300">{{ recent.title }}</h3>
-          </RouterLink>
-        </div>
-      </section>
+        </section>
 
       <section class="mt-12">
-        <h2 class="text-2xl font-semibold mb-6">留言</h2>
-        <hr class="border-gray-700 mb-8" />
-
-        <div v-if="!isCommentFormVisible" class="text-center">
+        
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-semibold">留言 ({{ post.comments.length }})</h2>
+          
           <button 
+            v-if="!isCommentFormVisible"
             @click="isCommentFormVisible = true"
-            class="bg-white text-black py-2 px-5 rounded-md font-semibold text-sm
+            class="bg-white text-black py-2 px-5 font-semibold text-sm
                    hover:bg-gray-300 transition-colors"
           >
             发表留言
           </button>
         </div>
+        
+        <hr class="border-gray-700 mb-8" />
         
         <Transition
           enter-active-class="transition-opacity duration-300 ease-out"
@@ -368,29 +327,31 @@ async function handleCommentSubmit() {
           </form>
         </Transition>
 
-        <div class="space-y-8 mt-12">
+        <div class="mt-12">
+          
           <div v-if="post.comments.length === 0 && !isCommentFormVisible" class="text-center text-gray-500">
             无法载入留言
           </div>
           
-          <div v-for="comment in post.comments" :key="comment.id" class="flex space-x-3">
-            <svg class="w-10 h-10 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-               <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 17a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"></path>
-            </svg>
-            <div class="flex-1">
-              <div class="flex items-center justify-between">
-                <span class="font-medium text-white">{{ comment.author_name }}</span>
-                <span class="text-xs text-gray-500">
-                  {{ new Date(comment.createdAt).toLocaleDateString('zh-CN') }}
-                </span>
-              </div>
-              <p class="text-gray-300 mt-1">{{ comment.content }}</p>
+          <div 
+            v-for="comment in post.comments" 
+            :key="comment.id" 
+            class="py-6"
+          >
+            <p class="text-lg text-gray-100">
+              {{ comment.content }}
+            </p>
+            <hr class="border-gray-700 mt-2 mb-4" />
+            <div class="text-right text-sm text-gray-500">
+              <span>{{ comment.author_name }}</span>
+              <span class="mx-1">发布于</span>
+              <span>{{ formatPreciseDate(comment.createdAt) }}</span>
             </div>
           </div>
 
         </div>
       </section>
-      
+
     </article>
   </div>
 </template>
