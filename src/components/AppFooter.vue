@@ -9,7 +9,7 @@
       <div class="flex space-x-4">
         
         <a a href="#" aria-label="Twitter" class="text-white hover:opacity-75 transition-opacity">
-          <font-awesome-icon :icon="['fab', 'twitter']" class="h-4 w-4" />
+          <font-awesome-icon :icon="['fab', 'x-twitter']" class="h-4 w-4" />
         </a>
         
         <a a href="#" aria-label="Twitter" class="text-white hover:opacity-75 transition-opacity">

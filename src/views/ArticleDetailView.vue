@@ -145,7 +145,7 @@ watch(() => route.params.slug, (newSlug) => {
           <font-awesome-icon :icon="['fab', 'facebook']" class="h-5 w-5" />
         </a>
         <a href="#" class="text-gray-400 hover:text-white" title="分享到 Twitter">
-          <font-awesome-icon :icon="['fab', 'twitter']" class="h-5 w-5" />
+          <font-awesome-icon :icon="['fab', 'x-twitter']" class="h-5 w-5" />
         </a>
         <a href="#" class="text-gray-400 hover:text-white" title="分享到 LinkedIn">
           <font-awesome-icon :icon="['fab', 'linkedin']" class="h-5 w-5" />
