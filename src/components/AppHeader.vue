@@ -43,7 +43,7 @@ import { RouterLink } from 'vue-router'
           
           <li class="flex-1 text-center transition-opacity duration-300 hover:opacity-50 group">
             <div class="h-0.5 bg-white mb-1 transition-all duration-300 group-hover:h-px"></div>
-            <RouterLink to="/blog" class="uppercase text-xs tracking-widest">Blog</RouterLink>
+            <RouterLink to="/article" class="uppercase text-xs tracking-widest">Article</RouterLink>
           </li>
           
         </ul>
