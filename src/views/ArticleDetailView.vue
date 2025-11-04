@@ -7,17 +7,28 @@ import { marked } from 'marked'
 const STRAPI_URL = 'http://8.137.176.118:1337' // 确保这是你的正确 IP
 const route = useRoute()
 
-// --- 1. (更新) 定义 "Recent Post" 接口 ---
-interface Post {
-  id: number
-  title: string
-  content: string
-  coverImageUrl: string
-  author: string
-  date: string
-  read_time_minutes: number
-  updatedAt: string // (新)
+
+//--- 定义 Comment 接口 ---
+interface Comment {
+    id: number
+    author_name: string
+    content: string
+    createdAt: string
 }
+
+interface Post {
+    id: number
+    title: string
+    content: string
+    coverImageUrl: string
+    author: string
+    date: string
+    read_time_minutes: number
+    updatedAt: string // (新)
+    comments: Comment[]
+}
+
+// --- 定义 "Recent Post" 接口 ---
 interface RecentPost {
   id: number
   title: string
@@ -28,6 +39,13 @@ interface RecentPost {
 const post = ref<Post | null>(null)
 const recentPosts = ref<RecentPost[]>([]) // (新)
 const isLoading = ref(true)
+
+// --- 2. (新增) 评论表单的状态 ---
+const newCommentName = ref('')
+const newCommentText = ref('')
+const isSubmitting = ref(false)
+
+const isCommentFormVisible = ref(false)
 
 // --- 2. (更新) 创建一个函数来获取数据 ---
 async function fetchArticle(slug: string) {
@@ -40,7 +58,7 @@ async function fetchArticle(slug: string) {
     const response = await axios.get(`${STRAPI_URL}/api/articles`, {
       params: {
         'filters[slug][$eq]': slug,
-        'populate': 'cover_image' // (保持简单)
+        'populate': ['cover_image','comments'] // (保持简单)
       }
     })
 
@@ -59,6 +77,9 @@ async function fetchArticle(slug: string) {
       }),
       read_time_minutes: item.read_time_minutes,
       updatedAt: new Date(item.updatedAt).toLocaleDateString('zh-CN'), // (新)
+      comments: (item.comments || []).sort((a: any,b: any)=>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
     }
 
     // --- (请求 2: 获取最新文章) ---
@@ -155,8 +176,47 @@ async function copyLink() {
   }
 }
 
-//
 // --- ( 新增功能结束 ) ---
+
+// --- 提交评论函数---
+async function handleCommentSubmit() {
+    if (!newCommentName.value.trim() || !newCommentText.value.trim() || !post.value)
+        {
+            alert('请填写你的昵称和评论内容')
+            return
+        }
+    isSubmitting.value = true
+    try {
+    // (关键!) 发送 POST 请求到 /api/comments
+    const response = await axios.post(`${STRAPI_URL}/api/comments`, {
+      data: {
+        author_name: newCommentName.value,
+        content: newCommentText.value,
+        article: post.value.id // <-- (关键!) 关联到当前文章
+      }
+        })
+
+        //实时更新评论
+        const newComment = response.data
+        // (为了安全, 格式化一下)
+        const formattedComment = {
+        id: newComment.id,
+        author_name: newComment.author_name,
+        content: newComment.content,
+        createdAt: newComment.createdAt
+        }
+        //添加到评论列表顶部
+        post.value.comments.unshift(formattedComment)
+        //清空表单
+        newCommentName.value = ''
+        newCommentText.value = ''
+    } catch(error: any) {
+        console.error('评论提交失败：',error);
+        alert('评论提交失败!');
+    } finally {
+        isSubmitting.value = false
+    }
+}
 
 </script>
 
@@ -243,12 +303,94 @@ async function copyLink() {
 
       <section class="mt-12">
         <h2 class="text-2xl font-semibold mb-6">留言</h2>
-        <div class="text-center text-gray-500 border border-gray-700 rounded-lg p-12">
-          <p>无法载入留言</p>
-          <p class="text-sm mt-2">似乎有技术问题。请刷新页面重试。</p>
+        <hr class="border-gray-700 mb-8" />
+
+        <div v-if="!isCommentFormVisible" class="text-center">
+          <button 
+            @click="isCommentFormVisible = true"
+            class="bg-white text-black py-2 px-5 rounded-md font-semibold text-sm
+                   hover:bg-gray-300 transition-colors"
+          >
+            发表留言
+          </button>
+        </div>
+        
+        <Transition
+          enter-active-class="transition-opacity duration-300 ease-out"
+          enter-from-class="opacity-0"
+          enter-to-class="opacity-100"
+          leave-active-class="transition-opacity duration-200 ease-in"
+          leave-from-class="opacity-100"
+          leave-to-class="opacity-0"
+        >
+          <form v-if="isCommentFormVisible" @submit.prevent="handleCommentSubmit" class="mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label for="comment-name" class="block text-sm font-medium text-gray-300 mb-1">昵称</label>
+                <input 
+                  v-model="newCommentName"
+                  type="text" 
+                  id="comment-name"
+                  class="w-full bg-zinc-800 text-white rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  required
+                />
+              </div>
+            </div>
+            <div>
+              <label for="comment-text" class="block text-sm font-medium text-gray-300 mb-1">评论内容</label>
+              <textarea 
+                v-model="newCommentText"
+                id="comment-text" 
+                rows="4"
+                class="w-full bg-zinc-800 text-white rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+                required
+              ></textarea>
+            </div>
+            <div class="mt-4 flex justify-end space-x-4">
+              <button 
+                type="button"
+                @click="isCommentFormVisible = false"
+                class="bg-zinc-700 text-white py-2 px-5 rounded-md font-semibold text-sm
+                       hover:bg-zinc-600 transition-colors"
+              >
+                取消
+              </button>
+              <button 
+                type="submit"
+                :disabled="isSubmitting"
+                class="bg-white text-black py-2 px-5 rounded-md font-semibold text-sm
+                       hover:bg-gray-300 transition-colors
+                       disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {{ isSubmitting ? '提交中...' : '提交评论' }}
+              </button>
+            </div>
+          </form>
+        </Transition>
+
+        <div class="space-y-8 mt-12">
+          <div v-if="post.comments.length === 0 && !isCommentFormVisible" class="text-center text-gray-500">
+            无法载入留言
+          </div>
+          
+          <div v-for="comment in post.comments" :key="comment.id" class="flex space-x-3">
+            <svg class="w-10 h-10 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+               <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 17a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"></path>
+            </svg>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-white">{{ comment.author_name }}</span>
+                <span class="text-xs text-gray-500">
+                  {{ new Date(comment.createdAt).toLocaleDateString('zh-CN') }}
+                </span>
+              </div>
+              <p class="text-gray-300 mt-1">{{ comment.content }}</p>
+            </div>
+          </div>
+
         </div>
       </section>
-
+      
     </article>
   </div>
 </template>
