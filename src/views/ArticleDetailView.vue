@@ -1,50 +1,86 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRoute, RouterLink } from 'vue-router'
 import axios from 'axios'
-import { marked } from 'marked' // (确保你已 npm install marked)
+import { marked } from 'marked' 
 
 const STRAPI_URL = 'http://8.137.176.118:1337' // 确保这是你的正确 IP
 const route = useRoute()
-const slug = route.params.slug as string
 
+// --- 1. (更新) 定义 "Recent Post" 接口 ---
 interface Post {
   id: number
   title: string
-  content: string // Markdown
+  content: string
+  coverImageUrl: string
+  author: string
+  date: string
+  read_time_minutes: number
+  updatedAt: string // (新)
+}
+interface RecentPost {
+  id: number
+  title: string
+  slug: string
   coverImageUrl: string
 }
 
 const post = ref<Post | null>(null)
+const recentPosts = ref<RecentPost[]>([]) // (新)
 const isLoading = ref(true)
 
-onMounted(async () => {
+// --- 2. (更新) 创建一个函数来获取数据 ---
+async function fetchArticle(slug: string) {
   isLoading.value = true
+  post.value = null // 清空旧数据
+  recentPosts.value = [] // 清空旧数据
+
   try {
-    // 1. (正确) 请求 /api/articles
+    // --- (请求 1: 获取当前文章) ---
     const response = await axios.get(`${STRAPI_URL}/api/articles`, {
       params: {
         'filters[slug][$eq]': slug,
-        'populate': 'cover_image'
+        'populate': 'cover_image' // (保持简单)
       }
     })
 
-    // 2. (正确) 使用 response.data.data
     const dataArray = response.data.data
+    if (!dataArray || dataArray.length === 0) throw new Error('未找到该文章')
     
-    if (!dataArray || dataArray.length === 0) {
-      throw new Error('未找到该文章')
-    }
-
-    const item = dataArray[0] // 获取数组中的第一项
-
-    // 3. (正确) 使用 V5 扁平结构
+    const item = dataArray[0]
     post.value = {
       id: item.id,
       title: item.title,
       content: item.content,
-      coverImageUrl: item.cover_image ? `${STRAPI_URL}${item.cover_image.url}` : ''
+      coverImageUrl: item.cover_image ? `${STRAPI_URL}${item.cover_image.url}` : '',
+      author: item.author,
+      date: new Date(item.publishedAt).toLocaleDateString('zh-CN', { 
+          year: 'numeric', month: 'long', day: 'numeric' 
+      }),
+      read_time_minutes: item.read_time_minutes,
+      updatedAt: new Date(item.updatedAt).toLocaleDateString('zh-CN'), // (新)
     }
+
+    // --- (请求 2: 获取最新文章) ---
+    const recentResponse = await axios.get(`${STRAPI_URL}/api/articles`, {
+      params: {
+        'populate': 'cover_image',
+        'filters[slug][$ne]': slug, // (关键: 排除当前文章)
+        'pagination[limit]': 3,
+        'sort': 'publishedAt:desc' // (获取最新的)
+      }
+    })
+    
+    const recentDataArray = recentResponse.data.data || []
+    recentPosts.value = recentDataArray.map((item: any) => {
+      if (!item.cover_image || !item.cover_image.url || !item.title) return null
+      return {
+        id: item.id,
+        title: item.title,
+        slug: item.slug,
+        coverImageUrl: `${STRAPI_URL}${item.cover_image.url}`
+      }
+    }).filter((item: RecentPost | null) => item !== null)
 
   } catch (error: any) {
     console.error('从 Strapi 获取文章详情失败:', error);
@@ -54,15 +90,24 @@ onMounted(async () => {
   } finally {
     isLoading.value = false
   }
-})
+}
 
-// (关键!) 将 Markdown 字符串转换为 HTML
+// (Markdown 转换 - 不变)
 const renderedContent = computed(() => {
   if (post.value && post.value.content) {
     return marked(post.value.content)
   }
   return ''
 })
+
+// --- 3. (新增) 监听路由变化 ---
+// (当用户从一篇 "Recent Post" 点击到另一篇时, 重新获取数据)
+watch(() => route.params.slug, (newSlug) => {
+  if (newSlug) {
+    fetchArticle(newSlug as string)
+  }
+}, { immediate: true }) // "immediate: true" 确保组件第一次加载时就运行
+
 </script>
 
 <template>
@@ -73,27 +118,85 @@ const renderedContent = computed(() => {
     </div>
 
     <article v-if="post">
-      <img 
-        v-if="post.coverImageUrl"
-        :src="post.coverImageUrl" 
-        :alt="post.title"
-        class="w-full h-auto rounded object-cover mb-8"
-      />
       
-      <h1 class="text-4xl font-semibold mb-6">{{ post.title }}</h1>
-      
+      <header class="mb-8">
+        <div class="text-gray-400 text-sm flex items-center space-x-2">
+          <span v-if="post.date">{{ post.date }}</span>
+          <span v-if="post.date && post.read_time_minutes" class="mx-1">•</span>
+          <span v-if="post.read_time_minutes">{{ post.read_time_minutes }} 分钟阅读</span>
+        </div>
+        
+        <h1 class="text-4xl md:text-5xl font-bold text-left my-4">
+          {{ post.title }}
+        </h1>
+        
+        <div class="text-gray-500 text-sm">
+          已更新: {{ post.updatedAt }}
+        </div>
+      </header>
+
       <div 
         v-html="renderedContent"
-        class="prose prose-invert prose-lg max-w-none"
+        class="prose prose-invert prose-lg max-w-3xl border-b mx-auto"
       ></div>
+
+      <div class="flex space-x-4 py-8 border-b border-gray-700">
+        <a href="#" class="text-gray-400 hover:text-white" title="分享到 Facebook">
+          <font-awesome-icon :icon="['fab', 'facebook']" class="h-5 w-5" />
+        </a>
+        <a href="#" class="text-gray-400 hover:text-white" title="分享到 Twitter">
+          <font-awesome-icon :icon="['fab', 'twitter']" class="h-5 w-5" />
+        </a>
+        <a href="#" class="text-gray-400 hover:text-white" title="分享到 LinkedIn">
+          <font-awesome-icon :icon="['fab', 'linkedin']" class="h-5 w-5" />
+        </a>
+        <a href="#" class="text-gray-400 hover:text-white" title="复制链接">
+          <font-awesome-icon :icon="['fas', 'link']" class="h-5 w-5" />
+        </a>
+      </div>
+
+      <section class="mt-12" v-if="recentPosts.length > 0">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-semibold">最新文章</h2>
+          <RouterLink to="/article" class="text-sm text-gray-400 hover:text-white">
+            查看全部
+          </RouterLink>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <RouterLink 
+            v-for="recent in recentPosts" 
+            :key="recent.id"
+            :to="{ name: 'ArticleDetail', params: { slug: recent.slug } }"
+            class="block group"
+          >
+            <div class="aspect-video overflow-hidden">
+              <img 
+                :src="recent.coverImageUrl" 
+                :alt="recent.title" 
+                class="w-full h-full object-cover 
+                       transition-transform duration-500 ease-in-out group-hover:scale-105"
+              />
+            </div>
+            <h3 class="mt-3 text-lg font-semibold group-hover:text-gray-300">{{ recent.title }}</h3>
+          </RouterLink>
+        </div>
+      </section>
+
+      <section class="mt-12">
+        <h2 class="text-2xl font-semibold mb-6">留言</h2>
+        <div class="text-center text-gray-500 border border-gray-700 rounded-lg p-12">
+          <p>无法载入留言</p>
+          <p class="text-sm mt-2">似乎有技术问题。请刷新页面重试。</p>
+        </div>
+      </section>
+
     </article>
   </div>
 </template>
 
 <style>
-/* (重要!) Tailwind "prose" 的默认样式修改 
-  我们让 Markdown 中的链接也变成白色
-*/
+/* (样式 - 不变) */
 .prose a {
   color: #fff;
   text-decoration: underline;

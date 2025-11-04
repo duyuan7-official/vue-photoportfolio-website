@@ -27,6 +27,7 @@ async function fetchArticles() {
   try{
     const params: any = {
       'populate': 'cover_image',
+      'sort': 'publishedAt:desc'
     }
     if (searchTerm.value.trim() !== '') {
       params['filters[title][$containsi]'] = searchTerm.value
@@ -126,42 +127,30 @@ onMounted(() => {
   <div class="pt-48 px-8 pb-24 text-white max-w-5xl mx-auto">
     
     <h1 class="text-3xl font-semibold mb-4">CLIENT SHOWCASE</h1>
-
     <div v-if="!isSearchActive" class="flex justify-between items-center border-b border-gray-700 pb-4 mb-12">
       <span class="text-lg">All Posts</span>
       <button @click="isSearchActive = true" class="text-gray-400 hover:text-white">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
       </button>
     </div>
-
     <div v-else class="relative mb-12">
       <div class="flex items-center border-b border-gray-600">
-        <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
+        <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         <input 
-          type="text"
-          v-model="searchTerm"
-          @keydown.enter="fetchArticles" 
+          type="text" v-model="searchTerm" @keydown.enter="fetchArticles" 
           placeholder="搜寻"
           class="w-full bg-transparent text-white pl-3 pr-10 py-2 text-lg focus:outline-none" 
         />
       </div>
-      <button 
-        @click="clearSearch"
-        class="text-gray-400 hover:text-white absolute top-1/2 right-0 -translate-y-1/2"
-      >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
+      <button @click="clearSearch" class="text-gray-400 hover:text-white absolute top-1/2 right-0 -translate-y-1/2">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
       </button>
     </div>
+
     <div v-if="isLoading" class="text-center text-gray-400">
       加载中...
     </div>
-    
+
     <div v-if="!isLoading" class="space-y-16">
       
       <div v-for="post in posts" :key="post.id">
@@ -169,13 +158,15 @@ onMounted(() => {
           
           <RouterLink 
             :to="{ name: 'ArticleDetail', params: { slug: post.slug } }"
-            class="block group overflow-hidden rounded"
+            class="block group overflow-hidden"
           >
-            <img 
-              :src="post.coverImageUrl" 
-              :alt="post.title" 
-              class="w-full h-auto object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
-            />
+            <div class="aspect-video overflow-hidden">
+              <img 
+                :src="post.coverImageUrl" 
+                :alt="post.title" 
+                class="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
+              />
+            </div>
           </RouterLink>
 
           <div class="relative flex flex-col h-full">
@@ -184,7 +175,6 @@ onMounted(() => {
               <svg class="w-10 h-10 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 17a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"></path>
               </svg>
-              
               <div class="text-sm">
                 <div v-if="post.author" class="text-white font-medium">{{ post.author }}</div>
                 <div class="text-gray-400 flex items-center space-x-2">
@@ -200,7 +190,7 @@ onMounted(() => {
             </RouterLink>
             
             <RouterLink :to="{ name: 'ArticleDetail', params: { slug: post.slug } }" class="group">
-              <p v-if="post.snippet" class="mt-4 text-gray-300 group-hover:text-gray-100">
+              <p v-if="post.snippet" class="mt-4 text-gray-300 group-hover:text-gray-100 flex-grow">
                 {{ post.snippet }}
               </p>
             </RouterLink>

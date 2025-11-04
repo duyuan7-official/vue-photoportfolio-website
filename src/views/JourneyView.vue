@@ -77,7 +77,7 @@ onMounted(async () => {
         v-for="journey in journeys" 
         :key="journey.id"
         @click="openJourney(journey.slug)"
-        class="block group relative rounded-lg overflow-hidden shadow-lg cursor-pointer"
+        class="block group relative overflow-hidden shadow-lg cursor-pointer"
       >
         <div class="aspect-[3/4] relative">
           <img 
