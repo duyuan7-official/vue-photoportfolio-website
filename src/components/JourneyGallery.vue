@@ -133,7 +133,7 @@ async function shareImage(event: Event, src: string, alt: string) {
                 : 'opacity-50 scale-100'  /* 状态C: 别的被悬停 */
           ]"
         >
-          <img :src="item.src" :alt="item.alt" class="w-full h-auto block rounded" />
+          <img :src="item.src" :alt="item.alt" class="w-full h-auto block" />
 
           <div 
             class="absolute bottom-0 left-0 right-0 p-4 
