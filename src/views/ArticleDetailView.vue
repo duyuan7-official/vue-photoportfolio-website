@@ -108,6 +108,56 @@ watch(() => route.params.slug, (newSlug) => {
   }
 }, { immediate: true }) // "immediate: true" 确保组件第一次加载时就运行
 
+// --- ( ✨ 第 127 步: 新增分享功能 ✨ ) ---
+//
+
+// 辅助函数: 打开一个新窗口
+function openShareWindow(url: string) {
+  window.open(url, '_blank', 'noopener,noreferrer,resizable=yes');
+}
+
+// 1. 分享到 qq
+function shareToQQ() {
+  if (!post.value) return;
+  const currentUrl = window.location.href;
+  const title = encodeURIComponent(post.value.title);
+  const url = `https://connect.qq.com/widget/shareqq/index.html?summary=${title}&url=${encodeURIComponent(currentUrl)}`;
+  openShareWindow(url);
+}
+
+// 2. 分享到 X (Twitter)
+function shareOnXTwitter() {
+  if (!post.value) return;
+  const currentUrl = window.location.href;
+  const text = encodeURIComponent(post.value.title);
+  const url = `https://x.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${text}`;
+  openShareWindow(url);
+}
+
+// 3. 分享到 LinkedIn
+function shareOnLinkedIn() {
+  if (!post.value) return;
+  const currentUrl = window.location.href;
+  const title = encodeURIComponent(post.value.title);
+  const url = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(currentUrl)}&title=${title}`;
+  openShareWindow(url);
+}
+
+// 4. 复制链接
+async function copyLink() {
+  const currentUrl = window.location.href;
+  try {
+    await navigator.clipboard.writeText(currentUrl);
+    alert('链接已复制到剪贴板！');
+  } catch (err) {
+    console.error('复制链接失败:', err);
+    alert('复制失败！');
+  }
+}
+
+//
+// --- ( 新增功能结束 ) ---
+
 </script>
 
 <template>
@@ -141,13 +191,21 @@ watch(() => route.params.slug, (newSlug) => {
       ></div>
 
       <div class="flex space-x-4 py-8 border-b border-gray-700">
-        <a href="#" class="text-gray-400 hover:text-white" title="分享到 Facebook">
-          <font-awesome-icon :icon="['fab', 'facebook']" class="h-5 w-5" />
+        <a 
+            href="#" 
+            @click.prevent="shareToQQ"
+            class="text-gray-400 hover:text-white" 
+            title="分享到 QQ">
+          <font-awesome-icon :icon="['fab', 'qq']" class="h-5 w-5" />
         </a>
-        <a href="#" class="text-gray-400 hover:text-white" title="分享到 Twitter">
+        <a href="#" 
+            @click.prevent="shareOnXTwitter"
+            class="text-gray-400 hover:text-white"
+            title="分享到 Twitter"
+            >
           <font-awesome-icon :icon="['fab', 'x-twitter']" class="h-5 w-5" />
         </a>
-        <a href="#" class="text-gray-400 hover:text-white" title="分享到 LinkedIn">
+        <a href="#" @click.prevent="shareOnLinkedIn" class="text-gray-400 hover:text-white" title="分享到 LinkedIn">
           <font-awesome-icon :icon="['fab', 'linkedin']" class="h-5 w-5" />
         </a>
         <a href="#" class="text-gray-400 hover:text-white" title="复制链接">
