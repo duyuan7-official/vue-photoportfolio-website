@@ -135,11 +135,11 @@ onMounted(() => {
     </div>
     <div v-else class="relative mb-12">
       <div class="flex items-center border-b border-gray-600">
-        <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <svg class="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         <input 
           type="text" v-model="searchTerm" @keydown.enter="fetchArticles" 
           placeholder="搜寻"
-          class="w-full bg-transparent text-white pl-3 pr-10 py-2 text-lg focus:outline-none" 
+          class="w-full bg-transparent text-white pl-3 pr-10 py-2 text-lg focus:outline-hidden" 
         />
       </div>
       <button @click="clearSearch" class="text-gray-400 hover:text-white absolute top-1/2 right-0 -translate-y-1/2">
@@ -172,7 +172,7 @@ onMounted(() => {
           <div class="relative flex flex-col h-full">
             
             <div class="flex items-center space-x-3">
-              <svg class="w-10 h-10 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-10 h-10 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 17a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"></path>
               </svg>
               <div class="text-sm">
@@ -190,7 +190,7 @@ onMounted(() => {
             </RouterLink>
             
             <RouterLink :to="{ name: 'ArticleDetail', params: { slug: post.slug } }" class="group">
-              <p v-if="post.snippet" class="mt-4 text-gray-300 group-hover:text-gray-100 flex-grow">
+              <p v-if="post.snippet" class="mt-4 text-gray-300 group-hover:text-gray-100 grow">
                 {{ post.snippet }}
               </p>
             </RouterLink>

@@ -79,7 +79,7 @@ onMounted(async () => {
         @click="openJourney(journey.slug)"
         class="block group relative overflow-hidden shadow-lg cursor-pointer"
       >
-        <div class="aspect-[3/4] relative">
+        <div class="aspect-3/4 relative">
           <img 
             :src="journey.coverImageUrl" 
             :alt="journey.title" 
@@ -87,7 +87,7 @@ onMounted(async () => {
                    transition-transform duration-500 ease-in-out group-hover:scale-105"
           />
           <div 
-            class="absolute inset-0 bg-gradient-to-t from-transparent to-black/70 
+            class="absolute inset-0 bg-linear-to-t from-transparent to-black/70 
                    transition-opacity duration-300 group-hover:opacity-0"
           ></div>
           <div 

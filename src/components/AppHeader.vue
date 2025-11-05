@@ -6,7 +6,7 @@ import { RouterLink } from 'vue-router'
   <header class="absolute top-0 left-0 right-0 z-10 p-8 text-white">
     <div class="container max-w-4xl mx-auto flex items-center">
       
-      <RouterLink to="/" class="flex-shrink-0 mr-3 text-right">
+      <RouterLink to="/" class="shrink-0 mr-3 text-right">
         <span class="block font-semibold text-3xl tracking-normal">Du Yuan</span>
         <span class="block font-normal text-lg tracking-widest">PHOTOGRAPHY</span>
       </RouterLink>
