@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+// 1. --- (新增) 导入 useRoute ---
+import { useRoute } from 'vue-router'
+
+// 2. --- (新增) 获取当前路由信息 ---
+const route = useRoute()
 </script>
 
 <template>
-  <header class="absolute top-0 left-0 right-0 z-10 p-8 text-white">
+  <header class="absolute top-0 left-0 right-0 z-100 p-8 text-white backdrop-blur-lg drop-shadow-lg">
     <div class="container max-w-4xl mx-auto flex items-center">
       
       <RouterLink to="/" class="shrink-0 mr-3 text-right">

@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-// 1. --- (移除 RouterLink), 导入新组件 ---
 import axios from 'axios'
-import JourneyGallery from '@/components/JourneyGallery.vue' // <-- 导入新组件
+import JourneyGallery from '@/components/JourneyGallery.vue'
+// 1. --- (新增) 导入 CardSwap ---
+import CardSwap from '@/components/Components/CardSwap/CardSwap.vue'
 
-// 2. --- (添加新 state) ---
-const selectedJourneySlug = ref<string | null>(null) // <-- 用于控制模态框
-
-// 3. --- (添加新函数) ---
+// ( selectedJourneySlug, openJourney, closeJourney - 保持不变 )
+const selectedJourneySlug = ref<string | null>(null)
 function openJourney(slug: string) {
   selectedJourneySlug.value = slug
 }
@@ -17,17 +16,14 @@ function closeJourney() {
 
 const STRAPI_URL = 'http://8.137.176.118:1337' // 确保这是你的正确 IP
 
+// ( 接口 和 Refs - 保持不变 )
 interface Journey {
-  id: number
-  title: string
-  slug: string
-  date: string
-  coverImageUrl: string
+  id: number, title: string, slug: string, date: string, coverImageUrl: string
 }
 const journeys = ref<Journey[]>([])
 const isLoading = ref(true)
 
-// (onMounted 函数保持不变)
+// ( onMounted 函数 - 保持不变 )
 onMounted(async () => {
   isLoading.value = true
   try {
@@ -73,39 +69,39 @@ onMounted(async () => {
     </div>
 
     <div v-if="!isLoading && journeys.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div 
+      
+      <CardSwap
         v-for="journey in journeys" 
         :key="journey.id"
         @click="openJourney(journey.slug)"
-        class="block group relative overflow-hidden shadow-lg cursor-pointer"
+        :show-border="false"
+        class-name="rounded-lg shadow-lg cursor-pointer"
       >
-        <div class="aspect-3/4 relative">
-          <img 
-            :src="journey.coverImageUrl" 
-            :alt="journey.title" 
-            class="absolute inset-0 w-full h-full object-cover 
-                   transition-transform duration-500 ease-in-out group-hover:scale-105"
-          />
-          <div 
-            class="absolute inset-0 bg-linear-to-t from-transparent to-black/70 
-                   transition-opacity duration-300 group-hover:opacity-0"
-          ></div>
-          <div 
-            class="absolute top-0 left-0 right-0 p-4 text-white 
-                   transition-opacity duration-300 group-hover:opacity-0"
-          >
-            <h2 class="text-xl font-semibold">{{ journey.title }}</h2>
-            <p class="text-sm text-gray-200">{{ journey.date }}</p>
+        <template #main>
+          <div class="aspect-[3/4] relative">
+            <img 
+              :src="journey.coverImageUrl" 
+              :alt="journey.title" 
+              class="absolute inset-0 w-full h-full object-cover"
+            />
           </div>
-        </div>
+        </template>
+        
+        <template #detail>
+          <div class="aspect-[3/4] relative p-4 flex flex-col justify-start items-start bg-zinc-900 text-white">
+            <h2 class="text-xl font-semibold">{{ journey.title }}</h2>
+            <p class="text-sm text-gray-400">{{ journey.date }}</p>
+            
+            <p class="mt-auto text-xs italic opacity-70">
+              点击查看相册
+            </p>
+          </div>
+        </template>
+      </CardSwap>
       </div>
-    </div>
 
     <div v-if="!isLoading && journeys.length === 0" class="text-center text-gray-400">
-      未找到 'journey' 分类的图片。
-      <br />
-      请确保你已在 Strapi 中上传并**发布**了图片。
-    </div>
+      </div>
   </div>
 
   <Transition
