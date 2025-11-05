@@ -4,16 +4,16 @@ import { RouterLink } from 'vue-router'
 
 <template>
   <header class="absolute top-0 left-0 right-0 z-10 p-8 text-white">
-    <div class="container max-w-4xl mx-auto flex items-center space-x-6">
+    <div class="container max-w-4xl mx-auto flex items-center">
       
-      <RouterLink to="/" class="flex-shrink-0">
-        <span class="block font-semibold text-lg tracking-wider">Du Yuan</span>
-        <span class="block font-light text-sm tracking-widest">PHOTOGRAPHY</span>
+      <RouterLink to="/" class="flex-shrink-0 mr-3 text-right">
+        <span class="block font-semibold text-3xl tracking-normal">Du Yuan</span>
+        <span class="block font-normal text-lg tracking-widest">PHOTOGRAPHY</span>
       </RouterLink>
 
       <div class="h-12 border-l-2 border-white/75"></div>
 
-      <nav class="flex-1">
+      <nav class="flex-1 ml-6">
         <ul class="flex space-x-4">
           
           <li class="flex-1 text-center transition-opacity duration-300 hover:opacity-50 group">
