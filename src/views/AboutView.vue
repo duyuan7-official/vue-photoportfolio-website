@@ -2,6 +2,7 @@
 // 我们不需要在这里导入 AppFooter, 
 // 因为它已经在 App.vue 中被全局加载了
  import TrueFocus from '@/components/TextAnimations/TrueFocus/TrueFocus.vue';
+ //修改TrueFocus的字体样式x需要在 TrueFocus.vue 组件中进行更改
 </script>
 
 <template>
@@ -15,6 +16,7 @@
         borderColor="green"
         :animationDuration="0.5"
         :pauseBetweenAnimations="1"
+        
         />
     </div>
     <p class="mb-4 text-gray-300">

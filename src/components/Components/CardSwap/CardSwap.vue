@@ -15,7 +15,7 @@
       v-for="(_, index) in 3"
       :key="index"
       ref="cardRefs"
-      class="card-swap-card absolute top-1/2 left-1/2 rounded-xl border border-white bg-black [transform-style:preserve-3d] [will-change:transform] [backface-visibility:hidden]"
+      class="card-swap-card absolute top-1/2 left-1/2 rounded-xl bg-black/60 [transform-style:preserve-3d] [will-change:transform] [backface-visibility:hidden]"
       :style="{
         width: typeof width === 'number' ? `${width}px` : width,
         height: typeof height === 'number' ? `${height}px` : height
@@ -40,6 +40,7 @@ export interface CardSwapProps {
   onCardClick?: (idx: number) => void;
   skewAmount?: number;
   easing?: 'linear' | 'elastic';
+  totalCards?: number;
 }
 
 interface Slot {
@@ -84,7 +85,8 @@ const props = withDefaults(defineProps<CardSwapProps>(), {
   delay: 5000,
   pauseOnHover: false,
   skewAmount: 6,
-  easing: 'elastic'
+  easing: 'elastic',
+  totalCards: 3
 });
 
 const emit = defineEmits<{
@@ -95,7 +97,7 @@ const containerRef = useTemplateRef<HTMLDivElement>('containerRef');
 const cardRefs = ref<HTMLElement[]>([]);
 const order = ref<number[]>([0, 1, 2]);
 const tlRef = ref<gsap.core.Timeline | null>(null);
-const intervalRef = ref<number>();
+const intervalRef = ref<number[]>(Array.from({ length: props.totalCards }, (_, i) => i));
 
 const handleCardClick = (index: number) => {
   emit('card-click', index);
