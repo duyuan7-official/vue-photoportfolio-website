@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-// 1. --- (移除 RouterLink), 导入新组件 ---
 import axios from 'axios'
-import JourneyGallery from '@/components/JourneyGallery.vue' // <-- 导入新组件
+import JourneyGallery from '@/components/JourneyGallery.vue'
+// 1. --- (导入 CardSwap - 保持不变) ---
+import CardSwap from '@/components/Components/CardSwap/CardSwap.vue'
+import TextType from '@/components/TextAnimations/TextType/TextType.vue'
 
-// 2. --- (添加新 state) ---
-const selectedJourneySlug = ref<string | null>(null) // <-- 用于控制模态框
+import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue'
 
-// 3. --- (添加新函数) ---
+// ( selectedJourneySlug, openJourney, closeJourney - 保持不变 )
+const selectedJourneySlug = ref<string | null>(null)
 function openJourney(slug: string) {
   selectedJourneySlug.value = slug
 }
@@ -15,19 +17,22 @@ function closeJourney() {
   selectedJourneySlug.value = null
 }
 
+// 2. --- (修复!) 恢复你原来的 handleCardClick ---
+// (这个函数只处理 *动画* 的点击, 不打开模态框)
+const handleCardClick = (index: number) => {
+  console.log(`Card ${index} clicked (this is the swap animation click)`);
+};
+
 const STRAPI_URL = 'http://8.137.176.118:1337' // 确保这是你的正确 IP
 
+// ( 接口 和 Refs - 保持不变 )
 interface Journey {
-  id: number
-  title: string
-  slug: string
-  date: string
-  coverImageUrl: string
+  id: number, title: string, slug: string, date: string, coverImageUrl: string
 }
 const journeys = ref<Journey[]>([])
 const isLoading = ref(true)
 
-// (onMounted 函数保持不变)
+// ( onMounted 函数 - 保持不变 )
 onMounted(async () => {
   isLoading.value = true
   try {
@@ -45,7 +50,7 @@ onMounted(async () => {
         id: item.id,
         title: item.title,
         slug: item.slug,
-        date: new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+        date: new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', 'day': 'numeric' }),
         coverImageUrl: `${STRAPI_URL}${item.cover_image.url}`
       }
     }).filter((item: Journey | null) => item !== null)
@@ -61,52 +66,73 @@ onMounted(async () => {
 </script>
 
 <template>
+  <div class="z-0 absolte fixed inset-0">
+    <Aurora
+      :color-stops="['#7cff67', '#171D22', '#7cff67']"
+      :amplitude="1.0"
+      :blend="0.5"
+      :speed="1.0"
+      :intensity="1.0"
+      class="w-full h-full"
+    />
+  </div>
   <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
-    
-    <h1 class="text-3xl font-semibold mb-2">CLIENTS</h1>
-    <p class="mb-12 text-gray-300">
-      Impress your clients by easily creating an album site that they'll love.
-    </p>
-
+      <div class="">
+          <TextType 
+        :text="['有一个想法，安慰着我：\n不管走到天涯海角，\n我离她都不会更远了。']"
+        :typingSpeed="75"
+        :as="'p'"
+        :pauseDuration="1500"
+        :showCursor="true"
+        :loop="true"
+        cursorCharacter="|"
+        :class-name="'text-3xl absolute mt-24 text-left tracking-wide leading-relaxed'"
+          />
+      </div>
     <div v-if="isLoading" class="text-center text-gray-400">
       加载中...
     </div>
+    
+    <div v-if="!isLoading && journeys.length > 0" class="relative flex mt-16 items-center h-[320px] ml-270">
+      <CardSwap
+        :total-cards="journeys.length" 
+        :pause-on-hover="false"
+        :width="600" 
+        :height="330" 
 
-    <div v-if="!isLoading && journeys.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div 
-        v-for="journey in journeys" 
-        :key="journey.id"
-        @click="openJourney(journey.slug)"
-        class="block group relative overflow-hidden shadow-lg cursor-pointer"
+        :class-name="'bg-transparent border-none'"
+        
+        @card-click="handleCardClick" 
       >
-        <div class="aspect-[3/4] relative">
-          <img 
-            :src="journey.coverImageUrl" 
-            :alt="journey.title" 
-            class="absolute inset-0 w-full h-full object-cover 
-                   transition-transform duration-500 ease-in-out group-hover:scale-105"
-          />
-          <div 
-            class="absolute inset-0 bg-gradient-to-t from-transparent to-black/70 
-                   transition-opacity duration-300 group-hover:opacity-0"
-          ></div>
-          <div 
-            class="absolute top-0 left-0 right-0 p-4 text-white 
-                   transition-opacity duration-300 group-hover:opacity-0"
-          >
-            <h2 class="text-xl font-semibold">{{ journey.title }}</h2>
-            <p class="text-sm text-gray-200">{{ journey.date }}</p>
-          </div>
+        <template 
+          v-for="(journey, index) in journeys" 
+          :key="journey.id" 
+          v-slot:[`card-${index}`]
+        >
+        <div class="m-2 flex items-center">
+          <i class="pi pi-circle-fill mr-2"></i>
+          <span>{{ journey.title }} At {{ journey.date }}</span>
         </div>
-      </div>
+          <div 
+            @click.stop="openJourney(journey.slug)"
+            class="relative w-full h-full rounded-lg overflow-hidden cursor-pointer group"
+          >
+            <img
+              :src="journey.coverImageUrl" 
+              :alt="journey.title" 
+              class="absolute inset-0 w-300 h-full" 
+            />
+          </div>
+        </template>
+        </CardSwap>
     </div>
-
     <div v-if="!isLoading && journeys.length === 0" class="text-center text-gray-400">
       未找到 'journey' 分类的图片。
       <br />
       请确保你已在 Strapi 中上传并**发布**了图片。
     </div>
   </div>
+  
 
   <Transition
     enter-active-class="transition-opacity duration-300 ease-out"
@@ -154,4 +180,5 @@ onMounted(async () => {
       </Transition>
     </div>
   </Transition>
+  
 </template>

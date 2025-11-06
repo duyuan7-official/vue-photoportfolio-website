@@ -1,12 +1,24 @@
 <script setup lang="ts">
 // 我们不需要在这里导入 AppFooter, 
 // 因为它已经在 App.vue 中被全局加载了
+ import TrueFocus from '@/components/TextAnimations/TrueFocus/TrueFocus.vue';
+ //修改TrueFocus的字体样式x需要在 TrueFocus.vue 组件中进行更改
 </script>
 
 <template>
   <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
     
-    <h1 class="text-3xl font-semibold mb-6">About us</h1>
+    <div class="pt-2 text-sm mb-6 justify-left flex font-thin">
+      <TrueFocus
+        sentence="About Us"
+        :manualMode="false"
+        :blurAmount="5"
+        borderColor="green"
+        :animationDuration="0.5"
+        :pauseBetweenAnimations="1"
+        
+        />
+    </div>
     <p class="mb-4 text-gray-300">
       I'm a title. Click here to add your own text and edit me. I'm a paragraph. Click here to add your own text and edit me. It's easy. Just click “Edit Text” or double click me and you can start adding your own content and make changes to the font. Feel free to drag and drop me anywhere you like on your page. I’m a great place for you to tell a story and let your users know a little more about you.
     </p>

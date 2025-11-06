@@ -290,7 +290,7 @@ function formatPreciseDate(dateString: string) {
                   v-model="newCommentName"
                   type="text" 
                   id="comment-name"
-                  class="w-full bg-zinc-800 text-white rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  class="w-full bg-zinc-800 text-white rounded-md p-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-gray-500"
                   required
                 />
               </div>
@@ -301,7 +301,7 @@ function formatPreciseDate(dateString: string) {
                 v-model="newCommentText"
                 id="comment-text" 
                 rows="4"
-                class="w-full bg-zinc-800 text-white rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+                class="w-full bg-zinc-800 text-white rounded-md p-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-gray-500"
                 required
               ></textarea>
             </div>

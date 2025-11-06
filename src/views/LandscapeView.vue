@@ -137,7 +137,7 @@ async function shareImage(event: Event, src: string, alt: string) {
           <img :src="item.src" :alt="item.alt" class="w-full h-auto block" />
           <div 
             class="absolute bottom-0 left-0 right-0 p-4 
-                   bg-gradient-to-t from-black/60 to-transparent
+                   bg-linear-to-t from-black/60 to-transparent
                    flex justify-between items-center
                    opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"
           >

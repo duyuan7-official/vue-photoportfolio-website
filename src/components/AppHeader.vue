@@ -1,19 +1,24 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+// 1. --- (新增) 导入 useRoute ---
+import { useRoute } from 'vue-router'
+
+// 2. --- (新增) 获取当前路由信息 ---
+const route = useRoute()
 </script>
 
 <template>
-  <header class="absolute top-0 left-0 right-0 z-10 p-8 text-white">
-    <div class="container max-w-4xl mx-auto flex items-center space-x-6">
+  <header class="absolute top-0 left-0 right-0 z-100 p-8 text-white backdrop-blur-lg drop-shadow-lg">
+    <div class="container max-w-4xl mx-auto flex items-center">
       
-      <RouterLink to="/" class="flex-shrink-0">
-        <span class="block font-semibold text-lg tracking-wider">Du Yuan</span>
-        <span class="block font-light text-sm tracking-widest">PHOTOGRAPHY</span>
+      <RouterLink to="/" class="shrink-0 mr-3 text-right">
+        <span class="block font-semibold text-3xl tracking-normal">Du Yuan</span>
+        <span class="block font-normal text-lg tracking-widest">PHOTOGRAPHY</span>
       </RouterLink>
 
       <div class="h-12 border-l-2 border-white/75"></div>
 
-      <nav class="flex-1">
+      <nav class="flex-1 ml-6">
         <ul class="flex space-x-4">
           
           <li class="flex-1 text-center transition-opacity duration-300 hover:opacity-50 group">
