@@ -5,7 +5,7 @@
 <template>
   <div
     ref="containerRef"
-    class="card-swap-container absolute bottom-0 right-0 transform translate-x-[5%] translate-y-[20%] origin-bottom-right perspective-[900px] overflow-visible max-[768px]:translate-x-[25%] max-[768px]:translate-y-[25%] max-[768px]:scale-[0.75] max-[480px]:translate-x-[25%] max-[480px]:translate-y-[25%] max-[480px]:scale-[0.55]"
+    class="card-swap-container absolute bottom-0 right-0 transform  origin-bottom-right perspective-[900px] overflow-visible max-[768px] max-[768px]:scale-[0.75] max-[480px]:scale-[0.55]"
     :style="{
       width: typeof width === 'number' ? `${width}px` : width,
       height: typeof height === 'number' ? `${height}px` : height

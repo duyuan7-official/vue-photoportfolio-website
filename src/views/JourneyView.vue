@@ -59,6 +59,7 @@ onMounted(async () => {
   }
 })
 </script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <template>
   <div class="z-0 absolte fixed inset-0">
@@ -71,64 +72,76 @@ onMounted(async () => {
       class="w-full h-full"
     />
   </div>
+
+  <div class="relative w-full overflow-x-hidden">
+  
   <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
-      <div class="">
-          <TextType 
-        :text="['有一个想法，安慰着我：\n不管走到天涯海角，\n我离她都不会更远了。']"
-        :typingSpeed="75"
-        :as="'p'"
-        :pauseDuration="1500"
-        :showCursor="true"
-        :loop="true"
-        cursorCharacter="|"
-        :class-name="'text-3xl absolute mt-24 text-left tracking-wide leading-relaxed'"
-          />
-      </div>
+    
     <div v-if="isLoading" class="text-center text-gray-400">
       加载中...
     </div>
     
-    <div v-if="!isLoading && journeys.length > 0" class="relative flex mt-16 items-center h-[320px] ml-270">
-      <CardSwap
-        :total-cards="journeys.length" 
-        :pause-on-hover="false"
-        :width="600" 
-        :height="330" 
-
-        :class-name="'bg-transparent border-none'"
-        
-        @card-click="handleCardClick" 
-      >
-        <template 
-          v-for="(journey, index) in journeys" 
-          :key="journey.id" 
-          v-slot:[`card-${index}`]
-        >
-        <div class="m-2 flex items-center">
-          <i class="pi pi-circle-fill mr-2"></i>
-          <span>{{ journey.title }} At {{ journey.date }}</span>
-        </div>
-          <div 
-            @click.stop="openJourney(journey.slug)"
-            class="relative w-full h-full rounded-lg overflow-hidden cursor-pointer group"
-          >
-            <img
-              :src="journey.coverImageUrl" 
-              :alt="journey.title" 
-              class="absolute inset-0 w-300 h-full" 
-            />
-          </div>
-        </template>
-        </CardSwap>
-    </div>
     <div v-if="!isLoading && journeys.length === 0" class="text-center text-gray-400">
       未找到 'journey' 分类的图片。
       <br />
       请确保你已在 Strapi 中上传并**发布**了图片。
     </div>
+
+    <div v-if="!isLoading && journeys.length > 0" class="flex flex-col lg:flex-row justify-between items-start gap-8">
+      
+      <div class="w-full lg:w-5/12 ">
+        <TextType
+          :text="['有一个想法，安慰着我：\n不管走到天涯海角，\n我离她都不会更远了。']"
+          :typingSpeed="75"
+          :as="'p'"
+          :pauseDuration="1500"
+          :showCursor="true"
+          :loop="true"
+          cursorCharacter="|"
+          :class-name="'text-3xl text-left tracking-wide leading-relaxed relative mt-24 lg:absolute'"
+        />
+      </div>
+
+      <div class="w-full relative lg:w-7/12 flex justify-center lg:block">
+
+        <div class="relative h-[400px] mt-24 
+                    lg:translate-x-16">
+          <CardSwap
+            :total-cards="journeys.length"
+            :pause-on-hover="false"
+            :width="550"  
+            :height="300"
+            :className="'bg-transparent border-none'"
+            @card-click="handleCardClick"
+          >
+            <template
+              v-for="(journey, index) in journeys"
+              :key="journey.id"
+              v-slot:[`card-${index}`]
+            >
+              <div class="m-2 flex items-center">
+                <i class="pi pi-circle-fill mr-2"></i>
+                <span>{{ journey.title }} At {{ journey.date }}</span>
+              </div>
+              <div
+                @click.stop="openJourney(journey.slug)"
+                class="relative w-full h-full overflow-hidden cursor-pointer group"
+              >
+                <img
+                  :src="journey.coverImageUrl"
+                  :alt="journey.title"
+                  class="absolute inset-0 w-300 h-full"
+                />
+              </div>
+            </template>
+          </CardSwap>
+        </div>
+      </div>
+    </div>
+    
+  </div>
   </div>
   
-
   <Transition
     enter-active-class="transition-opacity duration-300 ease-out"
     enter-from-class="opacity-0"
