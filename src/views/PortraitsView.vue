@@ -100,76 +100,88 @@ async function shareImage(event: Event, src: string, alt: string) {
 </script>
 
 <template>
-  <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
-    <h1 class="text-3xl font-semibold mb-6">PORTRAITS</h1>
-    <p class="mb-12 text-gray-300">
-      人像摄影作品集。点击图片查看大图，喜欢的话可以点赞、下载或分享给朋友！
-    </p>
+  <div class="z-0 absolute fixed inset-0">
+    <Aurora
+      :color-stops="['#7cff67', '#171D22', '#7cff67']"
+      :amplitude="1.0"
+      :blend="0.5"
+      :speed="1.0"
+      :intensity="1.0"
+      class="w-full h-full"
+    />
+  </div>
+  <div class="relative z-10">
+    <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
+      <h1 class="text-3xl font-semibold mb-6 ">PORTRAITS</h1>
+      <p class="mb-12 text-gray-300">
+        人像摄影作品集。点击图片查看大图，喜欢的话可以点赞、下载或分享给朋友！
+      </p>
 
-    <div v-if="isLoading" class="text-center text-gray-400">
-      从 Strapi 加载中...
-    </div>
+      <div v-if="isLoading" class="text-center text-gray-400">
+        从 Strapi 加载中...
+      </div>
 
-    <masonry-wall
-      v-if="!isLoading && imageGallery.length > 0"
-      :items="imageGallery"
-      :column-width="300" 
-      :gap="16"
-      @mouseleave="hoveredItemId = null"
-    >
-      <template #default="{ item }">
-        <div 
-          :key="item.id"
-          @mouseenter="hoveredItemId = item.id"
-          @mouseleave="hoveredItemId = null"
-          @click="openImage(item.src)"
-          class="relative cursor-pointer group/item"
-          :class="[
-            'transition-all duration-300',
-            hoveredItemId === null
-              ? 'opacity-100 scale-100' /* 状态A: 无悬停 */
-              : hoveredItemId === item.id
-                ? 'opacity-100 scale-105 z-10' /* 状态B: 这张被悬停 */
-                : 'opacity-50 scale-100'  /* 状态C: 别的被悬停 */
-          ]"
-                 >
-          <img :src="item.src" :alt="item.alt" class="w-full h-auto block" />
+      <masonry-wall
+        v-if="!isLoading && imageGallery.length > 0"
+        :items="imageGallery"
+        :column-width="300" 
+        :gap="16"
+        @mouseleave="hoveredItemId = null"
+      >
+        <template #default="{ item }">
           <div 
-            class="absolute bottom-0 left-0 right-0 p-4 
-                   bg-linear-to-t from-black/60 to-transparent
-                   flex justify-between items-center
-                   opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"
-          >
-            <button 
-              @click="toggleLike($event, item.id)"
-              :class="item.liked ? 'text-red-500' : 'text-white'"
-              class="hover:opacity-75 transition-colors"
+            :key="item.id"
+            @mouseenter="hoveredItemId = item.id"
+            @mouseleave="hoveredItemId = null"
+            @click="openImage(item.src)"
+            class="relative cursor-pointer group/item"
+            :class="[
+              'transition-all duration-300',
+              hoveredItemId === null
+                ? 'opacity-100 scale-100' /* 状态A: 无悬停 */
+                : hoveredItemId === item.id
+                  ? 'opacity-100 scale-105 z-10' /* 状态B: 这张被悬停 */
+                  : 'opacity-50 scale-100'  /* 状态C: 别的被悬停 */
+            ]"
+                  >
+            <img :src="item.src" :alt="item.alt" class="w-full h-auto block" />
+            <div 
+              class="absolute bottom-0 left-0 right-0 p-4 
+                    bg-linear-to-t from-black/60 to-transparent
+                    flex justify-between items-center
+                    opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"
             >
-              <font-awesome-icon :icon="item.liked ? ['fas', 'heart'] : ['far', 'heart']" class="h-5 w-5" />
-            </button>
-            <div class="flex space-x-4">
               <button 
-                @click="downloadImage($event, item.src, item.alt)"
-                class="text-white hover:text-gray-300 transition-colors"
+                @click="toggleLike($event, item.id)"
+                :class="item.liked ? 'text-red-500' : 'text-white'"
+                class="hover:opacity-75 transition-colors"
               >
-                <font-awesome-icon :icon="['fas', 'download']" class="h-5 w-5" />
+                <font-awesome-icon :icon="item.liked ? ['fas', 'heart'] : ['far', 'heart']" class="h-5 w-5" />
               </button>
-              <button 
-                @click="shareImage($event, item.src, item.alt)"
-                class="text-white hover:text-gray-300 transition-colors"
-              >
-                <font-awesome-icon :icon="['fas', 'share']" class="h-5 w-5" />
-              </button>
+              <div class="flex space-x-4">
+                <button 
+                  @click="downloadImage($event, item.src, item.alt)"
+                  class="text-white hover:text-gray-300 transition-colors"
+                >
+                  <font-awesome-icon :icon="['fas', 'download']" class="h-5 w-5" />
+                </button>
+                <button 
+                  @click="shareImage($event, item.src, item.alt)"
+                  class="text-white hover:text-gray-300 transition-colors"
+                >
+                  <font-awesome-icon :icon="['fas', 'share']" class="h-5 w-5" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </template>
-    </masonry-wall>
+        </template>
+      </masonry-wall>
 
-    <div v-if="!isLoading && imageGallery.length === 0" class="text-center text-gray-400">
-      未找到 'portraits' 分类的图片。
-      <br />
-      请确保你已在 Strapi 中上传并**发布**了图片。
+      <div v-if="!isLoading && imageGallery.length === 0" class="text-center text-gray-400">
+        未找到 'portraits' 分类的图片。
+        <br />
+        请确保你已在 Strapi 中上传并**发布**了图片。
+      </div>
     </div>
   </div>
 

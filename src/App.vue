@@ -11,7 +11,7 @@ import AppFooter from './components/AppFooter.vue';
     <main>
       <RouterView />
     </main>
-    <AppFooter class="lg:flex-shrink-0"/>
+    <AppFooter class="absolute lg:flex-shrink-0"/>
   </div>
 </template>
 

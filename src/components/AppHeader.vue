@@ -8,7 +8,7 @@ const route = useRoute()
 </script>
 
 <template>
-  <header class="absolute top-0 left-0 right-0 z-100 p-8 text-white backdrop-blur-lg drop-shadow-lg">
+  <header class="absolute top-0 left-0 right-0 z-80 p-8 text-white backdrop-blur-lg drop-shadow-lg">
     <div class="container max-w-4xl mx-auto flex items-center">
       
       <RouterLink to="/" class="shrink-0 mr-3 text-right">

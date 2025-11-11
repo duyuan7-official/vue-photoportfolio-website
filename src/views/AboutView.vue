@@ -29,8 +29,8 @@
     <div class="flex space-x-6 mt-12">
       
       <a href="#" class="flex items-center space-x-2 text-sm text-gray-300 hover:text-white transition-colors">
-        <font-awesome-icon :icon="['fab', 'twitter']" class="h-4 w-4" />
-        <span>Follow me on Twitter</span>
+        <font-awesome-icon :icon="['fab', 'x-twitter']" class="h-4 w-4" />
+        <span>Follow me on X</span>
       </a>
       
       <a href="#" class="flex items-center space-x-2 text-sm text-gray-300 hover:text-white transition-colors">

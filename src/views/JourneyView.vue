@@ -104,14 +104,14 @@ onMounted(async () => {
 
       <div class="w-full relative lg:w-7/12 flex justify-center lg:block">
 
-        <div class="relative h-[400px] mt-24 
+        <div class="relative h-[400px] mt-36 
                     lg:translate-x-16">
           <CardSwap
             :total-cards="journeys.length"
             :pause-on-hover="false"
             :width="550"  
             :height="300"
-            :className="'bg-transparent border-none'"
+            :className="'bg-transparent border-none overflow-hidden '"
             @card-click="handleCardClick"
           >
             <template
@@ -153,7 +153,7 @@ onMounted(async () => {
     <div
       v-if="selectedJourneySlug"
       @click="closeJourney"
-      class="fixed inset-0 z-40 flex items-center justify-center bg-black/80 p-4"
+      class="fixed backdrop-blur-lg inset-0 z-90 flex items-center justify-center "
     >
       <Transition
         appear
@@ -166,13 +166,13 @@ onMounted(async () => {
       >
         <div 
           @click.stop 
-          class="relative w-full max-w-5xl h-[90vh] bg-zinc-900 rounded-lg shadow-xl flex flex-col"
+          class="relative w-full h-full  back-blur-lg rounded-lg shadow-xl flex flex-col"
         >
           <button 
             @click="closeJourney" 
-            class="absolute top-3 right-3 z-50 p-1 rounded-full text-gray-400 hover:text-white hover:bg-zinc-700 transition-colors"
+            class="absolute top-8 right-8 z-50 p-1 rounded-full text-white hover:text-white hover:bg-zinc-600 transition-colors"
           >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
@@ -186,7 +186,7 @@ onMounted(async () => {
           </div>
         </div>
       </Transition>
-    </div>
+</div>
   </Transition>
   
 </template>
