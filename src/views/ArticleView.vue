@@ -2,9 +2,10 @@
 import { ref, onMounted, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import axios from 'axios'
+import { getArticles } from '@/api/contentService'
 
 // 确保 IP 地址正确
-const STRAPI_URL = 'http://8.137.176.118:1337' 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 interface ArticlePost {
   id: number
@@ -25,17 +26,7 @@ const isSearchActive = ref(false)//控制搜索栏显示与否
 async function fetchArticles() {
   isLoading.value = true
   try{
-    const params: any = {
-      'populate': 'cover_image',
-      'sort': 'publishedAt:desc'
-    }
-    if (searchTerm.value.trim() !== '') {
-      params['filters[title][$containsi]'] = searchTerm.value
-  }else{
-
-  }
-  const response = await axios.get(`${STRAPI_URL}/api/articles`, 
-  { params: params})
+  const response = await getArticles(searchTerm.value)
   const strapiData = response.data.data
     const dataArray = strapiData || [] 
     posts.value = dataArray.map((item: any) => {
@@ -44,7 +35,7 @@ async function fetchArticles() {
         id: item.id,
         title: item.title,
         slug: item.slug,
-        coverImageUrl: `${STRAPI_URL}${item.cover_image.url}`,
+        coverImageUrl: `${API_BASE_URL}${item.cover_image.url}`,
         snippet: item.snippet,
         author: item.author,
         read_time_minutes: item.read_time_minutes,

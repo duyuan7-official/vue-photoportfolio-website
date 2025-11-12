@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { getJourneys } from '@/api/contentService'
 import JourneyGallery from '@/components/JourneyGallery.vue'
 // 1. --- (导入 CardSwap - 保持不变) ---
 import CardSwap from '@/components/Components/CardSwap/CardSwap.vue'
@@ -23,7 +23,7 @@ const handleCardClick = (index: number) => {
   console.log(`Card ${index} clicked (this is the swap animation click)`);
 };
 
-const STRAPI_URL = 'http://8.137.176.118:1337' // 确保这是你的正确 IP
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 // ( 接口 和 Refs - 保持不变 )
 interface Journey {
@@ -36,12 +36,7 @@ const isLoading = ref(true)
 onMounted(async () => {
   isLoading.value = true
   try {
-    const response = await axios.get(`${STRAPI_URL}/api/journeys`, {
-      params: {
-        'populate': 'cover_image',
-        'sort': 'date:desc'
-      }
-    })
+    const response = await getJourneys()
     const strapiData = response.data.data
     const dataArray = strapiData || [] 
     journeys.value = dataArray.map((item: any) => {
@@ -51,7 +46,7 @@ onMounted(async () => {
         title: item.title,
         slug: item.slug,
         date: new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', 'day': 'numeric' }),
-        coverImageUrl: `${STRAPI_URL}${item.cover_image.url}`
+        coverImageUrl: `${API_BASE_URL}${item.cover_image.url}`
       }
     }).filter((item: Journey | null) => item !== null)
   } catch (error: any) {

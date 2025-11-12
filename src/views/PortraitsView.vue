@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import MasonryWall from '@yeger/vue-masonry-wall'
-import axios from 'axios'
+import { getPhotosByCategory } from '@/api/contentService'
 
 // 1. 你的 Strapi 服务器地址 (不变)
-const STRAPI_URL = 'http://8.137.176.118:1337'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 interface ImageItem {
   id: number
@@ -28,12 +28,7 @@ function closeImage() {
 onMounted(async () => {
   isLoading.value = true
   try {
-    const response = await axios.get(`${STRAPI_URL}/api/photos`, {
-      params: {
-        'populate': 'image', // 'populate' 语法不变
-        'filters[category][$eq]': 'portrait'
-      }
-    })
+    const response = await getPhotosByCategory('portrait')
 
     // 3. --- 转换 Strapi V5 的数据结构 (已修改) ---
     // response.data.data 仍然是正确的
@@ -49,7 +44,7 @@ onMounted(async () => {
       return {
         id: item.id, // V5: item.id (不变)
         // V5: item.image.url (移除了 .attributes.data.attributes)
-        src: `${STRAPI_URL}${item.image.url}`, 
+        src: `${API_BASE_URL}${item.image.url}`, 
         // V5: item.alt (移除了 .attributes)
         alt: item.alt, 
         liked: false
