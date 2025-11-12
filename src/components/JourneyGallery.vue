@@ -2,6 +2,7 @@
 import { ref, onMounted, computed} from 'vue'
 import MasonryWall from '@yeger/vue-masonry-wall'
 import { getJourneyBySlug } from '@/api/contentService';
+import DomeGallery from '@/components/Components/DomeGallery/DomeGallery.vue'
 
 const props = defineProps<{
   slug: string
@@ -70,7 +71,7 @@ const domeImageUrls = computed(() => {
       <DomeGallery
         :images="domeImageUrls"
         :fit="0.5"
-        fit-basis="auto"
+        fit-basis="height"
         :min-radius="600"
         :segments="26"
         :drag-sensitivity="20"

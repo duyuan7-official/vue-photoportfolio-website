@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import MasonryWall from '@yeger/vue-masonry-wall'
+import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue'
 import { getPhotosByCategory } from '@/api/contentService'
 
 // 1. 你的 Strapi 服务器地址 (不变)
@@ -111,7 +112,7 @@ async function shareImage(event: Event, src: string, alt: string) {
     />
   </div>
   <div class="relative z-10">
-    <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
+    <div class="pt-36 px-8 pb-24 text-white max-w-5xl mx-auto">
       <h1 class="text-3xl font-semibold mb-6 ">PORTRAITS</h1>
       <p class="mb-12 text-gray-300">
         人像摄影作品集。点击图片查看大图，喜欢的话可以点赞、下载或分享给朋友！

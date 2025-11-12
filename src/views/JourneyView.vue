@@ -5,7 +5,6 @@ import JourneyGallery from '@/components/JourneyGallery.vue'
 // 1. --- (导入 CardSwap - 保持不变) ---
 import CardSwap from '@/components/Components/CardSwap/CardSwap.vue'
 import TextType from '@/components/TextAnimations/TextType/TextType.vue'
-
 import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue'
 
 // ( selectedJourneySlug, openJourney, closeJourney - 保持不变 )

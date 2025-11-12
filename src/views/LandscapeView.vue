@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import MasonryWall from '@yeger/vue-masonry-wall'
 import { getPhotosByCategory } from '@/api/contentService'
+import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue'
 
 // 你的 Strapi 服务器地址
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -94,7 +95,17 @@ async function shareImage(event: Event, src: string, alt: string) {
 </script>
 
 <template>
-  <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
+  <div class="z-0 absolute fixed inset-0">
+    <Aurora
+      :color-stops="['#7cff67', '#171D22', '#7cff67']"
+      :amplitude="1.0"
+      :blend="0.5"
+      :speed="1.0"
+      :intensity="1.0"
+      class="w-full h-full"
+    />
+  </div>
+  <div class=" relative pt-36 px-8 pb-24 text-white max-w-5xl mx-auto">
     
     <h1 class="text-3xl font-semibold mb-6">LANDSCAPE</h1>
     <p class="mb-12 text-gray-300">
