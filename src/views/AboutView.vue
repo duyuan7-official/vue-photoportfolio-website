@@ -1,12 +1,23 @@
 <script setup lang="ts">
 // 我们不需要在这里导入 AppFooter, 
 // 因为它已经在 App.vue 中被全局加载了
- import TrueFocus from '@/components/TextAnimations/TrueFocus/TrueFocus.vue';
+ import TrueFocus from '@/components/TextAnimations/TrueFocus/TrueFocus.vue'
+ import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue';
  //修改TrueFocus的字体样式x需要在 TrueFocus.vue 组件中进行更改
 </script>
 
 <template>
-  <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
+  <div class="z-0 absolute fixed inset-0">
+    <Aurora
+      :color-stops="['#7cff67', '#171D22', '#7cff67']"
+      :amplitude="1.0"
+      :blend="0.5"
+      :speed="1.0"
+      :intensity="1.0"
+      class="w-full h-full"
+    />
+  </div>
+  <div class="pt-40 px-8 pb-24 text-white max-w-5xl mx-auto relative">
     
     <div class="pt-2 text-sm mb-6 justify-left flex font-thin">
       <TrueFocus
@@ -29,8 +40,8 @@
     <div class="flex space-x-6 mt-12">
       
       <a href="#" class="flex items-center space-x-2 text-sm text-gray-300 hover:text-white transition-colors">
-        <font-awesome-icon :icon="['fab', 'twitter']" class="h-4 w-4" />
-        <span>Follow me on Twitter</span>
+        <font-awesome-icon :icon="['fab', 'x-twitter']" class="h-4 w-4" />
+        <span>Follow me on X</span>
       </a>
       
       <a href="#" class="flex items-center space-x-2 text-sm text-gray-300 hover:text-white transition-colors">
