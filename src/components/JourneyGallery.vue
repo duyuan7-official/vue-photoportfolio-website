@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import MasonryWall from '@yeger/vue-masonry-wall'
-import axios from 'axios'
+import { getJourneyBySlug } from '@/api/contentService';
 
 // --- 
 // 1. (新增) JS 状态, 用于跟踪被悬停的图片 ID
@@ -13,9 +13,7 @@ const props = defineProps<{
   slug: string
 }>()
 
-// --- 2. (重要!) 移除所有路由相关的代码 (useRoute) ---
-
-const STRAPI_URL = 'http://8.137.176.118:1337' // 确保这是你的正确 IP
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL // 确保这是你的正确 IP
 
 interface ImageItem {
   id: number, src: string, alt: string, liked: boolean
@@ -33,13 +31,7 @@ function closeImage() { selectedImage.value = null }
 onMounted(async () => {
   isLoading.value = true
   try {
-    const response = await axios.get(`${STRAPI_URL}/api/journeys`, {
-      params: {
-        // --- 3. (重要!) 使用 props.slug ---
-        'filters[slug][$eq]': props.slug, 
-        'populate[photos][populate]': 'image' 
-      }
-    })
+    const response = await getJourneyBySlug(props.slug)
 
     const journeyData = response.data.data[0] 
     if (!journeyData) throw new Error('未找到旅程')
@@ -50,7 +42,7 @@ onMounted(async () => {
       if (!item.image || !item.image.url) return null
       return {
         id: item.id,
-        src: `${STRAPI_URL}${item.image.url}`, 
+        src: `${API_BASE_URL}${item.image.url}`, 
         alt: item.alt, 
         liked: false
       }

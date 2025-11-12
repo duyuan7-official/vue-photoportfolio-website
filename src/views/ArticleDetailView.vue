@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, Comment } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-import axios from 'axios'
+import { getArticleBySlug, getRecentArticles, postComment } from '@/api/contentService'
 import { marked } from 'marked' 
 
-const STRAPI_URL = 'http://8.137.176.118:1337' // 确保这是你的正确 IP
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 const route = useRoute()
 
 
@@ -55,12 +55,7 @@ async function fetchArticle(slug: string) {
 
   try {
     // --- (请求 1: 获取当前文章) ---
-    const response = await axios.get(`${STRAPI_URL}/api/articles`, {
-      params: {
-        'filters[slug][$eq]': slug,
-        'populate': ['cover_image','comments'] // (保持简单)
-      }
-    })
+    const response = await getArticleBySlug(slug)
 
     const dataArray = response.data.data
     if (!dataArray || dataArray.length === 0) throw new Error('未找到该文章')
@@ -70,7 +65,7 @@ async function fetchArticle(slug: string) {
       id: item.id,
       title: item.title,
       content: item.content,
-      coverImageUrl: item.cover_image ? `${STRAPI_URL}${item.cover_image.url}` : '',
+      coverImageUrl: item.cover_image ? `${API_BASE_URL}${item.cover_image.url}` : '',
       author: item.author,
       date: new Date(item.publishedAt).toLocaleDateString('zh-CN', { 
           year: 'numeric', month: 'long', day: 'numeric' 
@@ -83,15 +78,7 @@ async function fetchArticle(slug: string) {
     }
 
     // --- (请求 2: 获取最新文章) ---
-    const recentResponse = await axios.get(`${STRAPI_URL}/api/articles`, {
-      params: {
-        'populate': 'cover_image',
-        'filters[slug][$ne]': slug, // (关键: 排除当前文章)
-        'pagination[limit]': 3,
-        'sort': 'publishedAt:desc' // (获取最新的)
-      }
-    })
-    
+    const recentResponse = await getRecentArticles(slug)
     const recentDataArray = recentResponse.data.data || []
     recentPosts.value = recentDataArray.map((item: any) => {
       if (!item.cover_image || !item.cover_image.url || !item.title) return null
@@ -99,7 +86,7 @@ async function fetchArticle(slug: string) {
         id: item.id,
         title: item.title,
         slug: item.slug,
-        coverImageUrl: `${STRAPI_URL}${item.cover_image.url}`
+        coverImageUrl: `${API_BASE_URL}${item.cover_image.url}`
       }
     }).filter((item: RecentPost | null) => item !== null)
 
@@ -188,13 +175,7 @@ async function handleCommentSubmit() {
     isSubmitting.value = true
     try {
     // (关键!) 发送 POST 请求到 /api/comments
-    const response = await axios.post(`${STRAPI_URL}/api/comments`, {
-      data: {
-        author_name: newCommentName.value,
-        content: newCommentText.value,
-        article: post.value.id // <-- (关键!) 关联到当前文章
-      }
-        })
+    const response = await postComment(post.value.id,newCommentName.value,newCommentText.value)
 
         //实时更新评论
         const newComment = response.data.data
@@ -330,7 +311,7 @@ function formatPreciseDate(dateString: string) {
         <div class="mt-12">
           
           <div v-if="post.comments.length === 0 && !isCommentFormVisible" class="text-center text-gray-500">
-            无法载入留言
+            留言为空
           </div>
           
           <div 
