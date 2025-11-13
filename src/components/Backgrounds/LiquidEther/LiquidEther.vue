@@ -1,7 +1,3 @@
-<!--
-	Installed from https://vue-bits.dev/ui/
--->
-
 <template>
   <div ref="mountRef" :class="`w-full h-full relative overflow-hidden ${className || ''}`" :style="style" />
 </template>
@@ -1162,7 +1158,7 @@ const initWebGL = () => {
 
   const io = new IntersectionObserver(
     entries => {
-      const entry = entries[0];
+      const entry = entries[0]!;
       const isVisible = entry.isIntersecting && entry.intersectionRatio > 0;
       isVisibleRef.value = isVisible;
       if (!webglRef.value) return;

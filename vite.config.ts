@@ -13,6 +13,7 @@ export default defineConfig({
     vueDevTools(),
 //    tailwindcss(),
   ],
+  
   preview: {
     host: '0.0.0.0',
   },
@@ -24,4 +25,5 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  base: './',
 })

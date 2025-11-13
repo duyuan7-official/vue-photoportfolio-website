@@ -198,7 +198,7 @@ const setup = () => {
     const w = container.clientWidth || 1;
     const h = container.clientHeight || 1;
     renderer.setSize(w, h, false);
-    (material.uniforms.uCanvas.value as THREE.Vector2).set(w, h);
+    (material.uniforms.uCanvas?.value as THREE.Vector2).set(w, h);
   };
 
   handleResize();
@@ -214,19 +214,19 @@ const setup = () => {
   const loop = () => {
     const dt = clock.getDelta();
     const elapsed = clock.elapsedTime;
-    material.uniforms.uTime.value = elapsed;
+    if(material.uniforms.uTime)material.uniforms.uTime.value = elapsed;
 
     const deg = (rotationRef.value % 360) + autoRotateRef.value * elapsed;
     const rad = (deg * Math.PI) / 180;
     const c = Math.cos(rad);
     const s = Math.sin(rad);
-    (material.uniforms.uRot.value as THREE.Vector2).set(c, s);
+    (material.uniforms.uRot?.value as THREE.Vector2).set(c, s);
 
     const cur = pointerCurrentRef.value;
     const tgt = pointerTargetRef.value;
     const amt = Math.min(1, dt * pointerSmoothRef.value);
     cur.lerp(tgt, amt);
-    (material.uniforms.uPointer.value as THREE.Vector2).copy(cur);
+    (material.uniforms.uPointer?.value as THREE.Vector2).copy(cur);
     renderer.render(scene, camera);
     rafRef.value = requestAnimationFrame(loop);
   };
@@ -267,32 +267,47 @@ watch(
 
     rotationRef.value = props.rotation;
     autoRotateRef.value = props.autoRotate;
-    material.uniforms.uSpeed.value = props.speed;
-    material.uniforms.uScale.value = props.scale;
-    material.uniforms.uFrequency.value = props.frequency;
-    material.uniforms.uWarpStrength.value = props.warpStrength;
-    material.uniforms.uMouseInfluence.value = props.mouseInfluence;
-    material.uniforms.uParallax.value = props.parallax;
-    material.uniforms.uNoise.value = props.noise;
+    if(material.uniforms.uSpeed)material.uniforms.uSpeed.value = props.speed;
+    if(material.uniforms.uScale)material.uniforms.uScale.value = props.scale;
+    if(material.uniforms.uFrequency)material.uniforms.uFrequency.value = props.frequency;
+    if(material.uniforms.uWarpStrength)material.uniforms.uWarpStrength.value = props.warpStrength;
+    if(material.uniforms.uMouseInfluence)material.uniforms.uMouseInfluence.value = props.mouseInfluence;
+    if(material.uniforms.uParallax)material.uniforms.uParallax.value = props.parallax;
+    if(material.uniforms.uNoise)material.uniforms.uNoise.value = props.noise;
 
     const toVec3 = (hex: string) => {
       const h = hex.replace('#', '').trim();
       const v =
-        h.length === 3
-          ? [parseInt(h[0] + h[0], 16), parseInt(h[1] + h[1], 16), parseInt(h[2] + h[2], 16)]
-          : [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
-      return new THREE.Vector3(v[0] / 255, v[1] / 255, v[2] / 255);
-    };
+      h.length === 3
+      ? [
+          // 使用 slice 替代 [0], [1], [2]
+          parseInt(h.slice(0, 1) + h.slice(0, 1), 16),
+          parseInt(h.slice(1, 2) + h.slice(1, 2), 16),
+          parseInt(h.slice(2, 3) + h.slice(2, 3), 16)
+        ]
+      : [
+          parseInt(h.slice(0, 2), 16),
+          parseInt(h.slice(2, 4), 16),
+          parseInt(h.slice(4, 6), 16)
+        ];
 
+        // 使用 (v[0] || 0) 来处理 NaN 或 TS 认为的 undefined
+        return new THREE.Vector3(
+          (v[0] || 0) / 255,
+          (v[1] || 0) / 255,
+          (v[2] || 0) / 255
+        );
+      };
+material.uniforms.uTransparent
     const arr = (props.colors || []).filter(Boolean).slice(0, MAX_COLORS).map(toVec3);
     for (let i = 0; i < MAX_COLORS; i++) {
-      const vec = (material.uniforms.uColors.value as THREE.Vector3[])[i];
+      const vec = material.uniforms.uColors?.value[i];
       if (i < arr.length) vec.copy(arr[i]);
       else vec.set(0, 0, 0);
     }
-    material.uniforms.uColorCount.value = arr.length;
+    if(material.uniforms.uColorCount)material.uniforms.uColorCount.value = arr.length;
 
-    material.uniforms.uTransparent.value = props.transparent ? 1 : 0;
+    if(material.uniforms.uTransparent)material.uniforms.uTransparent.value = props.transparent ? 1 : 0;
     if (renderer) renderer.setClearColor(0x000000, props.transparent ? 0 : 1);
   },
   { deep: true }
