@@ -2,7 +2,9 @@
 import { ref, onMounted } from 'vue'
 import MasonryWall from '@yeger/vue-masonry-wall'
 import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue'
+import GradientText from '@/components/TextAnimations/GradientText/GradientText.vue'
 import { getPhotosByCategory } from '@/api/contentService'
+import TextType from '@/components/TextAnimations/TextType/TextType.vue'
 
 // 1. 你的 Strapi 服务器地址 (不变)
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -113,10 +115,31 @@ async function shareImage(event: Event, src: string, alt: string) {
   </div>
   <div class="relative z-10">
     <div class="pt-36 px-8 pb-24 text-white max-w-5xl mx-auto">
-      <h1 class="text-3xl font-semibold mb-6 ">PORTRAITS</h1>
-      <p class="mb-12 text-gray-300">
-        人像摄影作品集。点击图片查看大图，喜欢的话可以点赞、下载或分享给朋友！
-      </p>
+      <!-- <h1 class="text-3xl font-semibold mb-6 ">PORTRAITS</h1> -->
+    <div class="flex items-start mb-8">
+      <!-- 竖线装饰 -->
+      <div class="w-1 h-20 bg-gray-300 rounded-full mr-5 shrink-0"></div>
+
+      <!-- 两行字 -->
+      <div>
+        <GradientText
+          text="Portraits"
+          :animation-speed="8"
+          :show-border="false"
+          :colors="['#3ab43d', '#1dfd80','#45fcc6']"
+          class="text-4xl font-semibold mb-2 ml-0"
+        />
+        <TextType
+          text="生活不是我们活过的日子，而是我们我们记住的日子"
+          :typingSpeed="75"
+          :pauseDuration="1500"
+          :showCursor="true"
+          as="p"
+          cursorCharacter="_"
+          class="text-xl text-white"
+        />
+      </div>
+    </div>
 
       <div v-if="isLoading" class="text-center text-gray-400">
         从 Strapi 加载中...

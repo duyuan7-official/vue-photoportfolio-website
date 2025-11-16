@@ -44,7 +44,7 @@ onMounted(async () => {
         id: item.id,
         title: item.title,
         slug: item.slug,
-        date: new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', 'day': 'numeric' }),
+        date: new Date(item.date).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', 'day': 'numeric' }),
         coverImageUrl: `${API_BASE_URL}${item.cover_image.url}`
       }
     }).filter((item: Journey | null) => item !== null)
@@ -120,7 +120,7 @@ onMounted(async () => {
             >
               <div class="m-2 flex items-center">
                 <i class="pi pi-circle-fill mr-2"></i>
-                <span>{{ journey.title }} At {{ journey.date }}</span>
+                <span>{{ journey.title }} 于 {{ journey.date }}</span>
               </div>
               <div
                 @click.stop="openJourney(journey.slug)"

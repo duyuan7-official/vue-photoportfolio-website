@@ -3,6 +3,8 @@ import { ref, onMounted } from 'vue'
 import MasonryWall from '@yeger/vue-masonry-wall'
 import { getPhotosByCategory } from '@/api/contentService'
 import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue'
+import GradientText from '@/components/TextAnimations/GradientText/GradientText.vue'
+import TextType from '@/components/TextAnimations/TextType/TextType.vue'
 
 // 你的 Strapi 服务器地址
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -107,10 +109,30 @@ async function shareImage(event: Event, src: string, alt: string) {
   </div>
   <div class=" relative pt-36 px-8 pb-24 text-white max-w-5xl mx-auto">
     
-    <h1 class="text-3xl font-semibold mb-6">LANDSCAPE</h1>
-    <p class="mb-12 text-gray-300">
-      这里是风景摄影页面的描述文字。
-    </p>
+    <div class="flex items-start mb-8">
+      <!-- 竖线装饰 -->
+      <div class="w-1 h-20 bg-gray-300 rounded-full mr-5 shrink-0"></div>
+
+      <!-- 两行字 -->
+      <div>
+        <GradientText
+          text="LandScpae"
+          :animation-speed="5"
+          :show-border="false"
+          :colors="['#12c2e9', '#c471ed','#f64f59']"
+          class="text-4xl font-semibold mb-2 ml-0"
+        />
+        <TextType
+          text="生活不是我们活过的日子，而是我们我们记住的日子"
+          :typingSpeed="75"
+          :pauseDuration="1500"
+          :showCursor="true"
+          as="p"
+          cursorCharacter="_"
+          class="text-xl text-white"
+        />
+      </div>
+    </div>
 
     <div v-if="isLoading" class="text-center text-gray-400">
       从 Strapi 加载中...
