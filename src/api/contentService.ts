@@ -10,8 +10,9 @@ import apiClient from './apiClient';
  */
 export const getArticles = (searchTerm: string = '') => {
   const params: any = {
-    'populate': 'cover_image',
+    'populate[cover_image]': true,
     'sort': 'publishedAt:desc',
+    'populate[author][populate]': 'headshot',
   };
   if (searchTerm.trim() !== '') {
     params['filters[title][$containsi]'] = searchTerm;
@@ -28,6 +29,7 @@ export const getArticleBySlug = (slug: string) => {
     params: {
       'filters[slug][$eq]': slug,
       'populate': ['cover_image', 'comments'],
+      'populate[author][populate]': 'headshot',
     },
   });
 };

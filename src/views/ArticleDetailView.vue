@@ -100,6 +100,8 @@ async function fetchArticle(slug: string) {
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         )
     }
+    //更新浏览器标签
+    document.title = `${item.title} | DuYuan's Photography`
 
     // --- (请求 2: 获取最新文章) ---
     const recentResponse = await getRecentArticles(slug)

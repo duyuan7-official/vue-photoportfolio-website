@@ -14,6 +14,7 @@ interface ArticlePost {
   coverImageUrl: string
   snippet: string
   author: string
+  authorHeadshotUrl: string
   read_time_minutes: number
   date: string
 }
@@ -28,16 +29,25 @@ async function fetchArticles() {
   try{
   const response = await getArticles(searchTerm.value)
   const strapiData = response.data.data
-    const dataArray = strapiData || [] 
+    const dataArray = strapiData || []
+    
     posts.value = dataArray.map((item: any) => {
       if (!item.cover_image || !item.cover_image.url || !item.title) return null
+      const authorData = item.author || {}
+      const authorName = authorData.username || 'Unknown' // 假设 User 表有 username 字段
+      let authorHeadshotUrl = ''
+      if (authorData.headshot && authorData.headshot.url) {
+         // 如果你字段名叫 headshot
+         authorHeadshotUrl = `${API_BASE_URL}${authorData.headshot.url}`
+      }
       return {
         id: item.id,
         title: item.title,
         slug: item.slug,
         coverImageUrl: `${API_BASE_URL}${item.cover_image.url}`,
         snippet: item.snippet,
-        author: item.author,
+        author: authorName,
+        authorHeadshotUrl: authorHeadshotUrl,
         read_time_minutes: item.read_time_minutes,
         date: new Date(item.publishedAt).toLocaleDateString('zh-CN', { 
           year: 'numeric', 
@@ -65,53 +75,7 @@ function clearSearch() {
 onMounted(() => {
   fetchArticles()
 })
-// onMounted(async () => {
-//   isLoading.value = true
-//   try {
-//     // 1. (正确) 请求 /api/articles
-//     const response = await axios.get(`${STRAPI_URL}/api/articles`, {
-//       params: {
-//         'populate': 'cover_image',
-//         // 'sort': 'createdAt:desc' // (暂时禁用, 确保能获取数据)
-//       }
-//     })
 
-//     // 2. (正确) 使用 response.data.data
-//     const strapiData = response.data.data
-//     // 3. (正确) 检查 null
-//     const dataArray = strapiData || [] 
-    
-//     posts.value = dataArray.map((item: any) => {
-//       // 4. (正确) 检查 V5 扁平结构
-//       if (!item.cover_image || !item.cover_image.url || !item.title) return null
-//       return {
-//         id: item.id,
-//         title: item.title,
-//         slug: item.slug,
-//         coverImageUrl: `${STRAPI_URL}${item.cover_image.url}`,
-//         snippet: item.snippet,
-//         author: item.author,
-//         read_time_minutes: item.read_time_minutes,
-      
-//       // 2. --- (新增) 格式化 Strapi 自动提供的 "publishedAt" 字段 ---
-//         // (我们使用 'zh-CN' 来匹配 "年 月 日" 格式)
-//         date: new Date(item.publishedAt).toLocaleDateString('zh-CN', { 
-//           year: 'numeric', 
-//           month: 'long', 
-//           day: 'numeric' 
-//         })
-//       }
-//     }).filter((item: ArticlePost | null) => item !== null)
-
-//   } catch (error: any) {
-//     console.error('从 Strapi 获取文章失败:', error);
-//     if (error.response && error.response.data && error.response.data.error) {
-//       console.error("Strapi 错误详情:", error.response.data.error);
-//     }
-//   } finally {
-//     isLoading.value = false
-//   }
-// })
 </script>
 
 <template>
@@ -163,9 +127,19 @@ onMounted(() => {
           <div class="relative flex flex-col h-full">
             
             <div class="flex items-center space-x-3">
-              <svg class="w-10 h-10 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 17a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"></path>
-              </svg>
+              <template v-if="post.authorHeadshotUrl">
+                <img 
+                  :src="post.authorHeadshotUrl" 
+                  alt="Author Avatar" 
+                  class="w-10 h-10 rounded-full object-cover shrink-0" 
+                  style="border: 1px solid #4B5563;"
+                />
+              </template>
+              <template v-else>
+                <svg class="w-10 h-10 shrink-0 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 17a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"></path>
+                </svg>
+              </template>
               <div class="text-sm">
                 <div v-if="post.author" class="text-white font-medium">{{ post.author }}</div>
                 <div class="text-gray-400 flex items-center space-x-2">
