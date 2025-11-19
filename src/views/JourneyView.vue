@@ -61,7 +61,7 @@ onMounted(async () => {
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <template>
-  <div class="z-0 absolte fixed inset-0">
+  <div class="z-0 absolute fixed inset-0">
     <Aurora
       :color-stops="['#7cff67', '#171D22', '#7cff67']"
       :amplitude="1.0"

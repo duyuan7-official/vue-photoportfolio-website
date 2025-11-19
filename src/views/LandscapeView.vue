@@ -4,7 +4,8 @@ import MasonryWall from '@yeger/vue-masonry-wall'
 import { getPhotosByCategory } from '@/api/contentService'
 import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue'
 import GradientText from '@/components/TextAnimations/GradientText/GradientText.vue'
-import TextType from '@/components/TextAnimations/TextType/TextType.vue'
+import DecryptedText from '@/components/TextAnimations/DecryptedText/DecryptedText.vue'
+import TextGenerateEffect from '@/components/ui/text-generate-effect/TextGenerateEffect.vue'
 
 // 你的 Strapi 服务器地址
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -111,7 +112,7 @@ async function shareImage(event: Event, src: string, alt: string) {
     
     <div class="flex items-start mb-8">
       <!-- 竖线装饰 -->
-      <div class="w-1 h-20 bg-gray-300 rounded-full mr-5 shrink-0"></div>
+      <div class="w-1 h-28 bg-gray-300 rounded-full mr-5 shrink-0"></div>
 
       <!-- 两行字 -->
       <div>
@@ -122,15 +123,23 @@ async function shareImage(event: Event, src: string, alt: string) {
           :colors="['#12c2e9', '#c471ed','#f64f59']"
           class="text-4xl font-semibold mb-2 ml-0"
         />
-        <TextType
-          text="生活不是我们活过的日子，而是我们我们记住的日子"
-          :typingSpeed="75"
+          <TextGenerateEffect
+          class=""
+          words="这片疆域上的人们，对土地都有一种迷恋。在《飘 》里面，
+郝斯嘉的父亲对她说过这样的话：孩子,这世界上没有什么东西值得你为之拼命和流血，
+除了土地。"
+          />
+        <!-- <TextType
+          text="这片疆域上的人们，对土地都有一种迷恋。在《飘》里面，
+郝斯嘉的父亲对她说过这样的话：孩子，这世界上没有什么东西值得你为之拼命和流血，
+除了土地。"
+          :typingSpeed="50"
           :pauseDuration="1500"
           :showCursor="true"
           as="p"
           cursorCharacter="_"
-          class="text-xl text-white"
-        />
+          class="text-xl text-white text-left"
+        /> -->
       </div>
     </div>
 

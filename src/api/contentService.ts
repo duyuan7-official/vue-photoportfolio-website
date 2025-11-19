@@ -28,27 +28,11 @@ export const getArticleBySlug = (slug: string) => {
   return apiClient.get('/api/articles', {
     params: {
       'filters[slug][$eq]': slug,
-      'populate': ['cover_image', 'comments'],
-      'populate[author][populate]': 'headshot',
+      'populate': ['cover_image'],
     },
   });
 };
 
-/**
- * 提交评论 (用于 ArticleDetailView.vue)
- * @param articleId 关联的文章 ID
- * @param author 评论者昵称
- * @param content 评论内容
- */
-export const postComment = (articleId: number, author: string, content: string) => {
-  return apiClient.post('/api/comments', {
-    data: {
-      author_name: author,
-      content: content,
-      article: articleId,
-    },
-  });
-};
 
 /**
  * 按分类获取照片 (用于 PortraitsView.vue, LandscapeView.vue)

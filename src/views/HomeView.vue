@@ -1,9 +1,7 @@
 <script setup lang="ts">
  import { ref, onMounted } from 'vue';
  import LiquidEther from '../components/Backgrounds/LiquidEther/LiquidEther.vue'
- import GradientText from '../components/TextAnimations/GradientText/GradientText.vue'
- import ScrollReveal from '@/components/TextAnimations/ScrollReveal/ScrollReveal.vue';
-import { degToRad } from 'three/src/math/MathUtils.js';
+ import CurvedLoop from '@/components/TextAnimations/CurvedLoop/CurvedLoop.vue';
 
   const enableBlur = ref(true)
   const baseOpacity = ref(0.1) // 0 = 完全透明
@@ -27,7 +25,7 @@ import { degToRad } from 'three/src/math/MathUtils.js';
 </script>
 
 <template>
-  <div class="w-full h-[950px] relative">
+  <div class="w-full min-h-screen overflow-hidden h-dvh relative">
 
     <LiquidEther
       :colors="['#48FF28', '#A2FFC6', '#9EF19E']"
@@ -48,20 +46,17 @@ import { degToRad } from 'three/src/math/MathUtils.js';
       class="absolute z-0 inset-0"
     />
 
-    <div class="absolute inset-0 mt-42 z-20 p-48 flex items-center text-4xl text-warp tracking-wider">
-      <ScrollReveal
-        :children="scrollText"
-      :enable-blur="enableBlur"
-      :base-opacity="baseOpacity"
-      :base-rotation="baseRotation"
-      :blur-strength="blurStrength"
-      :container-class-name="containerClassName"
-      :text-class-name="textClassName"
-      :rotation-end="rotationEnd"
-      :word-animation-end="wordAnimationEnd"
-      :scroll-container-ref="{ current: containerRef }"
-      :key="rerenderKey"
-      />
+    <div class="absolute inset-0 px-4 md:px12 z-20 p-48 flex justify-center items-center text-4xl text-warp tracking-wider">
+      <div class="max-w-4xl w-full">
+        
+        <CurvedLoop
+        marquee-text="Welcome ✦ To ✦ Our ✦ Photography ✦ Portfolio ✦"
+        :speed="2"
+        :curve-amount="400"
+        direction="left"
+        :interactive="true"
+        />
+      </div>  
 
       
 
