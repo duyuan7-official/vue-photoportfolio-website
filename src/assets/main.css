@@ -35,6 +35,11 @@ body {
 @custom-variant dark (&:is(.dark *));
 @plugin '@tailwindcss/typography';
 
+
+@theme {
+  --font-serif: "Playfair Display", ui-serif;
+}
+
 :root {
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -107,6 +112,7 @@ body {
 }
 
 @theme inline {
+  --font-serif: "Playfair Display", ui-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -166,6 +172,14 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+
+  @font-face {
+    font-family: "Playfair Display";
+    src: url(fonts/PlayfairDisplay-VariableFont_wght.ttf)format("truetype");
+    font-weight: 200 900;
+    font-style: normal;
+  }
+
 }
 html {
   color-scheme: light dark;
@@ -175,11 +189,4 @@ html.dark {
 }
 html.light {
   color-scheme: light;
-}
-
-@font-face{
-  font-family: 'Playfair Display';
-  src: url('/vue-photoportfolio-website/public/fonts/PlayfairDisplay-VariableFont_wght.ttf');
-  font-weight: normal;
-  font-style: normal;
 }

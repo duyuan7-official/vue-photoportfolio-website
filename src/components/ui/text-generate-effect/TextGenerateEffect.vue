@@ -1,6 +1,6 @@
 <template>
   <div :class="cn('leading-snug tracking-wide', props.class)">
-    <div ref="scope" class="flex flex-wrap"> <template v-for="(item, idx) in parsedItems" :key="idx">
+    <div ref="scope" class="flex flex-wrap justify-center"> <template v-for="(item, idx) in parsedItems" :key="idx">
         
         <div v-if="item === '\n'" class="w-full h-0 basis-full"></div>
 

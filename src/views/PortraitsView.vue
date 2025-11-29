@@ -116,26 +116,14 @@ async function shareImage(event: Event, src: string, alt: string) {
   </div>
   <div class="relative z-10">
     <div class="pt-36 px-8 pb-24 text-white max-w-5xl mx-auto">
-      <!-- <h1 class="text-3xl font-semibold mb-6 ">PORTRAITS</h1> -->
-    <div class="flex items-start mb-8">
-      <!-- 竖线装饰 -->
-      <div class="w-1 h-20 bg-gray-300 rounded-full mr-5 shrink-0"></div>
-
+      <div class="text-black mix-blend-difference text-4xl font-serif text-center">Elegant Portrait Gallery</div>
       <!-- 两行字 -->
-      <div>
-        <GradientText
-          text="Portraits"
-          :animation-speed="8"
-          :show-border="false"
-          :colors="['#3ab43d', '#1dfd80','#45fcc6']"
-          class="text-4xl font-semibold mb-2 ml-0"
-        />
-        <TextGenerateEffect
-          class="text-black mix-blend-difference"
+        <div class="mb-10 mt-2 text-center">
+          <TextGenerateEffect
+          :class="'text-black mix-blend-difference text-center'"
           words="人像摄影不仅仅是捕捉一个人的外貌，更是捕捉他们的灵魂和故事。每一张人像照片都讲述着一个独特的故事，展现出被摄者的个性、情感和内在世界。"
           />
-      </div>
-    </div>
+        </div>
 
       <div v-if="isLoading" class="text-center text-gray-400">
         从 Strapi 加载中...
