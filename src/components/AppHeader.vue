@@ -8,11 +8,11 @@ const route = useRoute()
 </script>
 
 <template>
-  <header class="absolute top-0 left-0 right-0 z-80 p-8 text-white backdrop-blur-lg drop-shadow-lg">
+  <header class="absolute top-0 left-0 right-0 z-80 p-8 text-white bg-gray-500/20 backdrop-blur-lg drop-shadow-lg border-b border-white/10">
     <div class="container max-w-4xl mx-auto flex items-center">
       
       <RouterLink to="/" class="shrink-0 mr-3 text-right">
-        <span class="block font-semibold text-3xl tracking-normal">Du Yuan</span>
+        <span class="block font-semibold text-3xl tracking-normal mix-blend-difference">Du Yuan</span>
         <span class="block font-normal text-lg tracking-widest">PHOTOGRAPHY</span>
       </RouterLink>
 

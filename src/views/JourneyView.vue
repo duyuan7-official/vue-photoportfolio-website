@@ -63,7 +63,7 @@ onMounted(async () => {
 <template>
   <div class="z-0 absolute fixed inset-0">
     <Aurora
-      :color-stops="['#7cff67', '#171D22', '#7cff67']"
+      :color-stops="['#F5F5F7', '#E6E6EB', '#E7CEFF']"
       :amplitude="1.0"
       :blend="0.5"
       :speed="1.0"
@@ -88,7 +88,7 @@ onMounted(async () => {
 
     <div v-if="!isLoading && journeys.length > 0" class="flex flex-col lg:flex-row justify-between items-start gap-8">
       
-      <div class="w-full lg:w-5/12 ">
+      <div class="w-full lg:w-5/12 text-white mix-blend-difference">
         <TextType
           :text="['有一个想法，安慰着我：\n不管走到天涯海角，\n我离她都不会更远了。']"
           :typingSpeed="75"

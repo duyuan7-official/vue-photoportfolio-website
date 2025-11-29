@@ -100,7 +100,7 @@ async function shareImage(event: Event, src: string, alt: string) {
 <template>
   <div class="z-0 absolute fixed inset-0">
     <Aurora
-      :color-stops="['#7cff67', '#171D22', '#7cff67']"
+      :color-stops="['#F5F5F7', '#E6E6EB', '#E7CEFF']"
       :amplitude="1.0"
       :blend="0.5"
       :speed="1.0"
@@ -124,22 +124,11 @@ async function shareImage(event: Event, src: string, alt: string) {
           class="text-4xl font-semibold mb-2 ml-0"
         />
           <TextGenerateEffect
-          class=""
+          class="text-white mix-blend-difference"
           words="这片疆域上的人们，对土地都有一种迷恋。在《飘 》里面，
 郝斯嘉的父亲对她说过这样的话：孩子,这世界上没有什么东西值得你为之拼命和流血，
 除了土地。"
           />
-        <!-- <TextType
-          text="这片疆域上的人们，对土地都有一种迷恋。在《飘》里面，
-郝斯嘉的父亲对她说过这样的话：孩子，这世界上没有什么东西值得你为之拼命和流血，
-除了土地。"
-          :typingSpeed="50"
-          :pauseDuration="1500"
-          :showCursor="true"
-          as="p"
-          cursorCharacter="_"
-          class="text-xl text-white text-left"
-        /> -->
       </div>
     </div>
 

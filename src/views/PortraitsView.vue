@@ -4,6 +4,7 @@ import MasonryWall from '@yeger/vue-masonry-wall'
 import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue'
 import GradientText from '@/components/TextAnimations/GradientText/GradientText.vue'
 import { getPhotosByCategory } from '@/api/contentService'
+import TextGenerateEffect from '@/components/ui/text-generate-effect/TextGenerateEffect.vue'
 import TextType from '@/components/TextAnimations/TextType/TextType.vue'
 
 // 1. 你的 Strapi 服务器地址 (不变)
@@ -105,7 +106,7 @@ async function shareImage(event: Event, src: string, alt: string) {
 <template>
   <div class="z-0 absolute fixed inset-0">
     <Aurora
-      :color-stops="['#7cff67', '#171D22', '#7cff67']"
+      :color-stops="['#F5F5F7', '#E6E6EB', '#E7CEFF']"
       :amplitude="1.0"
       :blend="0.5"
       :speed="1.0"
@@ -129,15 +130,10 @@ async function shareImage(event: Event, src: string, alt: string) {
           :colors="['#3ab43d', '#1dfd80','#45fcc6']"
           class="text-4xl font-semibold mb-2 ml-0"
         />
-        <TextType
-          text="生活不是我们活过的日子，而是我们我们记住的日子"
-          :typingSpeed="75"
-          :pauseDuration="1500"
-          :showCursor="true"
-          as="p"
-          cursorCharacter="_"
-          class="text-xl text-white"
-        />
+        <TextGenerateEffect
+          class="text-black mix-blend-difference"
+          words="人像摄影不仅仅是捕捉一个人的外貌，更是捕捉他们的灵魂和故事。每一张人像照片都讲述着一个独特的故事，展现出被摄者的个性、情感和内在世界。"
+          />
       </div>
     </div>
 
