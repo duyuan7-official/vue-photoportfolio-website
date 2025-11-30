@@ -11,26 +11,34 @@ import ArticleDetailView from '@/views/ArticleDetailView.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: HomeView },
-  { path: '/about', name: 'About', component: AboutView },
-  { path: '/portraits', name: 'Portraits', component: PortraitsView },
-  { path: '/landscape', name: 'Landscape', component: LandscapeView },
-  { path: '/journey', name: 'Journey', component: JourneyView },
+  { path: '/about', name: 'About', component: AboutView, meta:{title:'About'} },
+  { path: '/portraits', name: 'Portraits', component: PortraitsView, meta:{title:'Portraits'} },
+  { path: '/landscape', name: 'Landscape', component: LandscapeView, meta:{title:'Landscape'} },
+  { path: '/journey', name: 'Journey', component: JourneyView, meta:{title:'journey'} },
   //{ 
   //  path: '/journey/:slug',
   //  name: 'JourneyDetail',
   //  component: JourneyDetailView
   //},
-  { path: '/article', name: 'Blog', component: ArticleView },
+  { path: '/article', name: 'Blog', component: ArticleView, meta:{title:'Articles'} },
   { 
     path: '/article/:slug',
     name: 'ArticleDetail',
-    component: ArticleDetailView
+    component: ArticleDetailView,
+    
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+})
+
+router.beforeEach((to, from, next) => {
+  // 获取路由定义的 title，如果没有定义则使用默认标题
+  const pageTitle = to.meta.title ? `${to.meta.title} | DuYuan's Photography` : "DuYuan's Photography"
+  document.title = pageTitle as string
+  next()
 })
 
 export default router

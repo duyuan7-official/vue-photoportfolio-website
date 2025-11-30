@@ -1,10 +1,14 @@
-<script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
-import axios from 'axios'
-import { marked } from 'marked' 
 
-const STRAPI_URL = 'http://8.137.176.118:1337' // 确保这是你的正确 IP
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, computed, watch, Comment } from 'vue'
+import { useRoute, RouterLink } from 'vue-router'
+import { getArticleBySlug, getRecentArticles, } from '@/api/contentService'
+import { marked } from 'marked' 
+import { Motion } from "motion-v";
+import AuroraBackground from '@/components/ui/aurora-background/AuroraBackground.vue';
+
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 const route = useRoute()
 
 
@@ -47,6 +51,33 @@ const isSubmitting = ref(false)
 
 const isCommentFormVisible = ref(false)
 
+onMounted(async () => {
+  document.body.classList.add('article-detail-page')
+  // 动态导入 Waline 客户端
+  // 使用 @ts-ignore 来绕过 TypeScript 对外部 URL 模块的类型检查
+  // 如果需要更严格的类型支持，请在项目中添加一个全局声明文件（例如 src/types/waline.d.ts）
+  // @ts-ignore
+  const walineModule = await import('https://unpkg.com/@waline/client@v2/dist/waline.mjs')
+    .catch((e) => {
+      console.warn('Waline 动态导入失败:', e);
+      return null;
+    });
+
+  // 初始化 Waline（如果导入成功）
+  if (walineModule && (walineModule as any).init) {
+    const { init } = walineModule as any;
+    init({
+      el: '#waline', // 确保这个 ID 和模板中的 DIV 匹配
+      serverURL: 'https://waline-photoportfolio-website.vercel.app/', // 示例：'https://your-waline-server.com'
+      // ... 其他配置 ...
+    });
+  }
+});
+//取消标签——导航栏变色
+onUnmounted(() => {
+  document.body.classList.remove('article-detail-page')
+})
+
 // --- 2. (更新) 创建一个函数来获取数据 ---
 async function fetchArticle(slug: string) {
   isLoading.value = true
@@ -55,12 +86,7 @@ async function fetchArticle(slug: string) {
 
   try {
     // --- (请求 1: 获取当前文章) ---
-    const response = await axios.get(`${STRAPI_URL}/api/articles`, {
-      params: {
-        'filters[slug][$eq]': slug,
-        'populate': ['cover_image','comments'] // (保持简单)
-      }
-    })
+    const response = await getArticleBySlug(slug)
 
     const dataArray = response.data.data
     if (!dataArray || dataArray.length === 0) throw new Error('未找到该文章')
@@ -70,7 +96,7 @@ async function fetchArticle(slug: string) {
       id: item.id,
       title: item.title,
       content: item.content,
-      coverImageUrl: item.cover_image ? `${STRAPI_URL}${item.cover_image.url}` : '',
+      coverImageUrl: item.cover_image ? `${API_BASE_URL}${item.cover_image.url}` : '',
       author: item.author,
       date: new Date(item.publishedAt).toLocaleDateString('zh-CN', { 
           year: 'numeric', month: 'long', day: 'numeric' 
@@ -81,17 +107,11 @@ async function fetchArticle(slug: string) {
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         )
     }
+    //更新浏览器标签
+    document.title = `${item.title} | DuYuan's Photography`
 
     // --- (请求 2: 获取最新文章) ---
-    const recentResponse = await axios.get(`${STRAPI_URL}/api/articles`, {
-      params: {
-        'populate': 'cover_image',
-        'filters[slug][$ne]': slug, // (关键: 排除当前文章)
-        'pagination[limit]': 3,
-        'sort': 'publishedAt:desc' // (获取最新的)
-      }
-    })
-    
+    const recentResponse = await getRecentArticles(slug)
     const recentDataArray = recentResponse.data.data || []
     recentPosts.value = recentDataArray.map((item: any) => {
       if (!item.cover_image || !item.cover_image.url || !item.title) return null
@@ -99,7 +119,7 @@ async function fetchArticle(slug: string) {
         id: item.id,
         title: item.title,
         slug: item.slug,
-        coverImageUrl: `${STRAPI_URL}${item.cover_image.url}`
+        coverImageUrl: `${API_BASE_URL}${item.cover_image.url}`
       }
     }).filter((item: RecentPost | null) => item !== null)
 
@@ -179,44 +199,7 @@ async function copyLink() {
 // --- ( 新增功能结束 ) ---
 
 // --- 提交评论函数---
-async function handleCommentSubmit() {
-    if (!newCommentName.value.trim() || !newCommentText.value.trim() || !post.value)
-        {
-            alert('请填写你的昵称和评论内容')
-            return
-        }
-    isSubmitting.value = true
-    try {
-    // (关键!) 发送 POST 请求到 /api/comments
-    const response = await axios.post(`${STRAPI_URL}/api/comments`, {
-      data: {
-        author_name: newCommentName.value,
-        content: newCommentText.value,
-        article: post.value.id // <-- (关键!) 关联到当前文章
-      }
-        })
 
-        //实时更新评论
-        const newComment = response.data.data
-        // (为了安全, 格式化一下)
-        const formattedComment = {
-        id: newComment.id,
-        author_name: newComment.author_name,
-        content: newComment.content,
-        createdAt: newComment.createdAt
-        }
-        //添加到评论列表顶部
-        post.value.comments.unshift(formattedComment)
-        //清空表单
-        newCommentName.value = ''
-        newCommentText.value = ''
-    } catch(error: any) {
-        console.error('评论提交失败：',error);
-        alert('评论提交失败!');
-    } finally {
-        isSubmitting.value = false
-    }
-}
 
 // --- ( ✨ 2. 新增! 精确的时间格式化函数 ✨ ) ---
 function formatPreciseDate(dateString: string) {
@@ -235,134 +218,204 @@ function formatPreciseDate(dateString: string) {
 </script>
 
 <template>
-  <div class="pt-48 px-8 pb-24 text-white max-w-5xl mx-auto">
+  <div class="relative w-full min-h-screen">
     
-    <div v-if="isLoading" class="text-center text-gray-400">
-      加载中...
-    </div>
+    <AuroraBackground class="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none" />
 
-    <article v-if="post">
+    <main class="relative z-10">
       
-      <header class="mb-8">
-        <h1 class="text-4xl md:text-5xl font-bold text-left my-4">
-          {{ post.title }}
-        </h1>
-        </header>
-      <div 
-        v-html="renderedContent"
-        class="prose prose-invert prose-lg max-w-3xl border-b mx-auto"
-      ></div>
-      <div class="flex space-x-4 py-8 border-b border-transparent">
+      <Motion
+        as="div"
+        :initial="{ opacity: 0, y: 40, filter: 'blur(10px)' }"
+        :while-in-view="{
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+        }"
+        :transition="{
+          delay: 0.3,
+          duration: 0.8,
+          ease: 'easeInOut',
+        }"
+        class="relative flex flex-col items-center justify-center gap-4 px-4 "
+      >
+       
+      
+      <div class="pt-48 px-8 pb-24 text-white max-w-3xl mx-auto">
+        
+        <div v-if="isLoading" class="text-center text-gray-400">
+          加载中...
         </div>
-      <section class="mt-12" v-if="recentPosts.length > 0">
-        </section>
 
-      <section class="mt-12">
-        
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-semibold">留言 ({{ post.comments.length }})</h2>
+        <article 
+        v-if="post"
+        class="bg-[#fdfbf7] p-8 md:p-12 rounded-2xl shadow-2xl ring-1 ring-gray-900/5 mt-8 text-slate-800">
           
-          <button 
-            v-if="!isCommentFormVisible"
-            @click="isCommentFormVisible = true"
-            class="bg-white text-black py-2 px-5 font-semibold text-sm
-                   hover:bg-gray-300 transition-colors"
-          >
-            发表留言
-          </button>
-        </div>
-        
-        <hr class="border-gray-700 mb-8" />
-        
-        <Transition
-          enter-active-class="transition-opacity duration-300 ease-out"
-          enter-from-class="opacity-0"
-          enter-to-class="opacity-100"
-          leave-active-class="transition-opacity duration-200 ease-in"
-          leave-from-class="opacity-100"
-          leave-to-class="opacity-0"
-        >
-          <form v-if="isCommentFormVisible" @submit.prevent="handleCommentSubmit" class="mb-12">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label for="comment-name" class="block text-sm font-medium text-gray-300 mb-1">昵称</label>
-                <input 
-                  v-model="newCommentName"
-                  type="text" 
-                  id="comment-name"
-                  class="w-full bg-zinc-800 text-white rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
-                  required
-                />
-              </div>
+          <header class="mb-8">
+            <div class="text-slate-600 text-sm flex items-center space-x-2">
+              <span v-if="post.date">{{ post.date }}</span>
+              <span v-if="post.date && post.read_time_minutes" class="mx-1">•</span>
+              <span v-if="post.read_time_minutes">{{ post.read_time_minutes }} 分钟阅读</span>
             </div>
-            <div>
-              <label for="comment-text" class="block text-sm font-medium text-gray-300 mb-1">评论内容</label>
-              <textarea 
-                v-model="newCommentText"
-                id="comment-text" 
-                rows="4"
-                class="w-full bg-zinc-800 text-white rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
-                required
-              ></textarea>
+            
+            <h1 class="text-4xl text-slate-900 md:text-5xl font-bold text-left my-4">
+              {{ post.title }}
+            </h1>
+            
+            <div class="text-gray-500 text-sm">
+              已更新: {{ post.updatedAt }}
             </div>
-            <div class="mt-4 flex justify-end space-x-4">
-              <button 
-                type="button"
-                @click="isCommentFormVisible = false"
-                class="bg-zinc-700 text-white py-2 px-5 rounded-md font-semibold text-sm
-                       hover:bg-zinc-600 transition-colors"
-              >
-                取消
-              </button>
-              <button 
-                type="submit"
-                :disabled="isSubmitting"
-                class="bg-white text-black py-2 px-5 rounded-md font-semibold text-sm
-                       hover:bg-gray-300 transition-colors
-                       disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {{ isSubmitting ? '提交中...' : '提交评论' }}
-              </button>
-            </div>
-          </form>
-        </Transition>
+          </header>
 
-        <div class="mt-12">
-          
-          <div v-if="post.comments.length === 0 && !isCommentFormVisible" class="text-center text-gray-500">
-            无法载入留言
-          </div>
-          
           <div 
-            v-for="comment in post.comments" 
-            :key="comment.id" 
-            class="py-6"
-          >
-            <p class="text-lg text-gray-100">
-              {{ comment.content }}
-            </p>
-            <hr class="border-gray-700 mt-2 mb-4" />
-            <div class="text-right text-sm text-gray-500">
-              <span>{{ comment.author_name }}</span>
-              <span class="mx-1">发布于</span>
-              <span>{{ formatPreciseDate(comment.createdAt) }}</span>
-            </div>
+            v-html="renderedContent"
+            class="prose prose-invert prose-lg max-w-none border-b border-gray-700 pb-8"
+          ></div>
+
+          <div class="flex space-x-4 py-8 border-b border-gray-700">
+            <a 
+                href="#" 
+                @click.prevent="shareToQQ"
+                class="text-gray-400 hover:text-white" 
+                title="分享到 QQ">
+              <font-awesome-icon :icon="['fab', 'qq']" class="h-5 w-5" />
+            </a>
+            <a href="#" 
+                @click.prevent="shareOnXTwitter"
+                class="text-gray-400 hover:text-white"
+                title="分享到 Twitter"
+                >
+              <font-awesome-icon :icon="['fab', 'x-twitter']" class="h-5 w-5" />
+            </a>
+            <a href="#" @click.prevent="shareOnLinkedIn" class="text-gray-400 hover:text-white" title="分享到 LinkedIn">
+              <font-awesome-icon :icon="['fab', 'linkedin']" class="h-5 w-5" />
+            </a>
+            <a href="#" @click.prevent="copyLink" class="text-gray-400 hover:text-white" title="复制链接">
+              <font-awesome-icon :icon="['fas', 'link']" class="h-5 w-5" />
+            </a>
           </div>
 
-        </div>
-      </section>
+          <section class="mt-12" v-if="recentPosts.length > 0">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-xl font-semibold">最新文章</h2>
+              <RouterLink to="/article" class="text-sm text-gray-400 hover:text-white">
+                查看全部
+              </RouterLink>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <RouterLink 
+                v-for="recent in recentPosts" 
+                :key="recent.id"
+                :to="{ name: 'ArticleDetail', params: { slug: recent.slug } }"
+                class="block group"
+              >
+                <div class="aspect-video overflow-hidden">
+                  <img 
+                    :src="recent.coverImageUrl" 
+                    :alt="recent.title" 
+                    class="w-full h-full object-cover 
+                          transition-transform duration-500 ease-in-out group-hover:scale-105"
+                  />
+                </div>
+                <h3 class="mt-3 text-lg font-semibold group-hover:text-gray-300">{{ recent.title }}</h3>
+              </RouterLink>
+            </div>
+          </section>
 
-    </article>
+          <section class="mt-12">
+            <hr class="border-gray-700 mb-8" />
+            <div id="waline" class="waline-theme"></div>
+          </section>
+
+        </article>
+      </div>
+      </Motion>
+    </main>
   </div>
 </template>
 
 <style>
+@import url('https://unpkg.com/@waline/client@v2/dist/waline.css');
 /* (样式 - 不变) */
-.prose a {
-  color: #fff;
-  text-decoration: underline;
-}
+/* Markdown 文章配色方案：Deep Ocean (适配明亮背景) 
+  直接覆盖 Tailwind Typography 的 CSS 变量
+*/
 .prose a:hover {
-  color: #ccc;
+  color: #1d4ed8; /* 更深的蓝色 */
+  text-decoration-thickness: 2px;
+}
+.prose {
+  /* --- 核心文字 --- */
+  --tw-prose-body: #334155;      /* 正文：深蓝灰 (Slate-700) - 柔和且清晰 */
+  --tw-prose-headings: #0f172a;  /* 标题：午夜蓝 (Slate-900) - 强调权威感 */
+  --tw-prose-lead: #475569;      /* 导语：中灰 (Slate-600) */
+
+  /* --- 强调与链接 --- */
+  --tw-prose-bold: #020617;      /* 加粗：近乎纯黑 (Slate-950) */
+  --tw-prose-links: #2563eb;     /* 链接：宝蓝色 (Blue-600) - 醒目 */
+  
+  /* --- 列表与引用 --- */
+  --tw-prose-counters: #64748b;  /* 有序列表序号 (Slate-500) */
+  --tw-prose-bullets: #475569;   /* 无序列表圆点 (Slate-600) */
+  --tw-prose-quotes: #1e293b;    /* 引用文字 (Slate-800) */
+  --tw-prose-quote-borders: #cbd5e1; /* 引用左侧边框 (Slate-300) */
+
+  /* --- 代码块 (保持暗色风格以突出代码) --- */
+  --tw-prose-pre-bg: #1e293b;    /* 代码块背景：深蓝灰 */
+  --tw-prose-pre-code: #f1f5f9;  /* 代码块文字：极浅灰 */
+  
+  /* --- 行内代码 (`code`) --- */
+  --tw-prose-code: #dc2626;      /* 行内代码：深红色 (Red-600) - 类似 Notion 风格 */
+  
+  /* --- 分割线 --- */
+  --tw-prose-hr: #cbd5e1;        /* 分割线：浅灰 (Slate-300) */
+  
+  /* --- 图片说明 --- */
+  --tw-prose-captions: #64748b;  /* 图片底部文字 (Slate-500) */
+}
+
+/* --- 导航栏颜色覆盖 (仅在当前页面生效) --- */
+
+/* 1. 强制把 header 里的链接(a), 文字(span/div), 图标(svg/i) 变色 */
+body.article-detail-page header a,
+body.article-detail-page header span,
+body.article-detail-page header div,
+body.article-detail-page header h1,
+body.article-detail-page header h2,
+body.article-detail-page nav a {
+    color: #0f172a !important; /* Slate-900: 深午夜蓝 */
+    transition: color 0.3s ease; /* 加个过渡动画更自然 */
+}
+
+/* 2. 处理 header 里的 svg 图标 (比如搜索、菜单图标) */
+body.article-detail-page header svg,
+body.article-detail-page header i {
+    fill: #0f172a !important;
+    color: #0f172a !important;
+}
+
+/* 3. 鼠标悬停时的颜色 (可选，比如变浅一点的灰) */
+body.article-detail-page header a:hover {
+    color: #475569 !important; /* Slate-600 */
+}
+
+/* --- (可选) 修正 Logo 颜色 --- */
+/* 如果你的 Logo 是图片则不需要这句；如果是文字则需要 */
+body.article-detail-page .logo-text-class { 
+    color: #0f172a !important; 
+}
+/* 1. 导航文字上方的横线装饰条 */
+/* 对应结构：nav -> ul -> li -> div (原本是 bg-white) */
+body.article-detail-page header nav li div {
+    background-color: #0f172a !important; /* Slate-900: 变为深午夜蓝 */
+}
+
+/* 2. Logo 和 导航 之间的竖线分隔符 */
+/* 对应结构：<div class="h-12 border-l-2 border-white/75"> */
+/* 我们利用 Tailwind 的类名作为选择器来覆盖它 */
+body.article-detail-page header .border-white\/75 {
+    border-color: #cbd5e1 !important; /* Slate-300: 变为浅灰色，比纯黑好看 */
+    opacity: 1 !important; /* 重置透明度 */
 }
 </style>

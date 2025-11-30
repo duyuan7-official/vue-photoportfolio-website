@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import MasonryWall from '@yeger/vue-masonry-wall'
-import axios from 'axios'
+import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue'
+import GradientText from '@/components/TextAnimations/GradientText/GradientText.vue'
+import { getPhotosByCategory } from '@/api/contentService'
+import TextGenerateEffect from '@/components/ui/text-generate-effect/TextGenerateEffect.vue'
+import TextType from '@/components/TextAnimations/TextType/TextType.vue'
 
 // 1. 你的 Strapi 服务器地址 (不变)
-const STRAPI_URL = 'http://8.137.176.118:1337'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 interface ImageItem {
   id: number
@@ -28,12 +32,7 @@ function closeImage() {
 onMounted(async () => {
   isLoading.value = true
   try {
-    const response = await axios.get(`${STRAPI_URL}/api/photos`, {
-      params: {
-        'populate': 'image', // 'populate' 语法不变
-        'filters[category][$eq]': 'portrait'
-      }
-    })
+    const response = await getPhotosByCategory('portrait')
 
     // 3. --- 转换 Strapi V5 的数据结构 (已修改) ---
     // response.data.data 仍然是正确的
@@ -49,7 +48,7 @@ onMounted(async () => {
       return {
         id: item.id, // V5: item.id (不变)
         // V5: item.image.url (移除了 .attributes.data.attributes)
-        src: `${STRAPI_URL}${item.image.url}`, 
+        src: `${API_BASE_URL}${item.image.url}`, 
         // V5: item.alt (移除了 .attributes)
         alt: item.alt, 
         liked: false
@@ -105,76 +104,92 @@ async function shareImage(event: Event, src: string, alt: string) {
 </script>
 
 <template>
-  <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
-    <h1 class="text-3xl font-semibold mb-6">PORTRAITS</h1>
-    <p class="mb-12 text-gray-300">
-      人像摄影作品集。点击图片查看大图，喜欢的话可以点赞、下载或分享给朋友！
-    </p>
+  <div class="z-0 absolute fixed inset-0">
+    <Aurora
+      :color-stops="['#F5F5F7', '#f3ecde', '#F5F5F7']"
+      :amplitude="1.0"
+      :blend="0.5"
+      :speed="1.0"
+      :intensity="1.0"
+      class="w-full h-full"
+    />
+  </div>
+  <div class="relative z-10">
+    <div class="pt-36 px-8 pb-24 text-white max-w-5xl mx-auto">
+      <div class="text-black mix-blend-difference text-4xl font-serif text-center">Elegant Portrait Gallery</div>
+      <!-- 两行字 -->
+        <div class="mb-10 mt-2 text-center">
+          <TextGenerateEffect
+          :class="'text-black mix-blend-difference text-center'"
+          words="人像摄影不仅仅是捕捉一个人的外貌，更是捕捉他们的灵魂和故事。每一张人像照片都讲述着一个独特的故事，展现出被摄者的个性、情感和内在世界。"
+          />
+        </div>
 
-    <div v-if="isLoading" class="text-center text-gray-400">
-      从 Strapi 加载中...
-    </div>
+      <div v-if="isLoading" class="text-center text-gray-400">
+        从 Strapi 加载中...
+      </div>
 
-    <masonry-wall
-      v-if="!isLoading && imageGallery.length > 0"
-      :items="imageGallery"
-      :column-width="300" 
-      :gap="16"
-      @mouseleave="hoveredItemId = null"
-    >
-      <template #default="{ item }">
-        <div 
-          :key="item.id"
-          @mouseenter="hoveredItemId = item.id"
-          @mouseleave="hoveredItemId = null"
-          @click="openImage(item.src)"
-          class="relative cursor-pointer group/item"
-          :class="[
-            'transition-all duration-300',
-            hoveredItemId === null
-              ? 'opacity-100 scale-100' /* 状态A: 无悬停 */
-              : hoveredItemId === item.id
-                ? 'opacity-100 scale-105 z-10' /* 状态B: 这张被悬停 */
-                : 'opacity-50 scale-100'  /* 状态C: 别的被悬停 */
-          ]"
-                 >
-          <img :src="item.src" :alt="item.alt" class="w-full h-auto block" />
+      <masonry-wall
+        v-if="!isLoading && imageGallery.length > 0"
+        :items="imageGallery"
+        :column-width="300" 
+        :gap="16"
+        @mouseleave="hoveredItemId = null"
+      >
+        <template #default="{ item }">
           <div 
-            class="absolute bottom-0 left-0 right-0 p-4 
-                   bg-gradient-to-t from-black/60 to-transparent
-                   flex justify-between items-center
-                   opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"
-          >
-            <button 
-              @click="toggleLike($event, item.id)"
-              :class="item.liked ? 'text-red-500' : 'text-white'"
-              class="hover:opacity-75 transition-colors"
+            :key="item.id"
+            @mouseenter="hoveredItemId = item.id"
+            @mouseleave="hoveredItemId = null"
+            @click="openImage(item.src)"
+            class="relative cursor-pointer group/item"
+            :class="[
+              'transition-all duration-300',
+              hoveredItemId === null
+                ? 'opacity-100 scale-100' /* 状态A: 无悬停 */
+                : hoveredItemId === item.id
+                  ? 'opacity-100 scale-105 z-10' /* 状态B: 这张被悬停 */
+                  : 'opacity-50 scale-100'  /* 状态C: 别的被悬停 */
+            ]"
+                  >
+            <img :src="item.src" :alt="item.alt" class="w-full h-auto block" />
+            <div 
+              class="absolute bottom-0 left-0 right-0 p-4 
+                    bg-linear-to-t from-black/60 to-transparent
+                    flex justify-between items-center
+                    opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"
             >
-              <font-awesome-icon :icon="item.liked ? ['fas', 'heart'] : ['far', 'heart']" class="h-5 w-5" />
-            </button>
-            <div class="flex space-x-4">
               <button 
-                @click="downloadImage($event, item.src, item.alt)"
-                class="text-white hover:text-gray-300 transition-colors"
+                @click="toggleLike($event, item.id)"
+                :class="item.liked ? 'text-red-500' : 'text-white'"
+                class="hover:opacity-75 transition-colors"
               >
-                <font-awesome-icon :icon="['fas', 'download']" class="h-5 w-5" />
+                <font-awesome-icon :icon="item.liked ? ['fas', 'heart'] : ['far', 'heart']" class="h-5 w-5" />
               </button>
-              <button 
-                @click="shareImage($event, item.src, item.alt)"
-                class="text-white hover:text-gray-300 transition-colors"
-              >
-                <font-awesome-icon :icon="['fas', 'share']" class="h-5 w-5" />
-              </button>
+              <div class="flex space-x-4">
+                <button 
+                  @click="downloadImage($event, item.src, item.alt)"
+                  class="text-white hover:text-gray-300 transition-colors"
+                >
+                  <font-awesome-icon :icon="['fas', 'download']" class="h-5 w-5" />
+                </button>
+                <button 
+                  @click="shareImage($event, item.src, item.alt)"
+                  class="text-white hover:text-gray-300 transition-colors"
+                >
+                  <font-awesome-icon :icon="['fas', 'share']" class="h-5 w-5" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </template>
-    </masonry-wall>
+        </template>
+      </masonry-wall>
 
-    <div v-if="!isLoading && imageGallery.length === 0" class="text-center text-gray-400">
-      未找到 'portraits' 分类的图片。
-      <br />
-      请确保你已在 Strapi 中上传并**发布**了图片。
+      <div v-if="!isLoading && imageGallery.length === 0" class="text-center text-gray-400">
+        未找到 'portraits' 分类的图片。
+        <br />
+        请确保你已在 Strapi 中上传并**发布**了图片。
+      </div>
     </div>
   </div>
 

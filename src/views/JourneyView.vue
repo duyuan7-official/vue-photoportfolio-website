@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-// 1. --- (移除 RouterLink), 导入新组件 ---
-import axios from 'axios'
-import JourneyGallery from '@/components/JourneyGallery.vue' // <-- 导入新组件
+import { getJourneys } from '@/api/contentService'
+import JourneyGallery from '@/components/JourneyGallery.vue'
+// 1. --- (导入 CardSwap - 保持不变) ---
+import CardSwap from '@/components/Components/CardSwap/CardSwap.vue'
+import TextType from '@/components/TextAnimations/TextType/TextType.vue'
+import TextGenerateEffect from '@/components/ui/text-generate-effect/TextGenerateEffect.vue'
+import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue'
 
-// 2. --- (添加新 state) ---
-const selectedJourneySlug = ref<string | null>(null) // <-- 用于控制模态框
-
-// 3. --- (添加新函数) ---
+// ( selectedJourneySlug, openJourney, closeJourney - 保持不变 )
+const selectedJourneySlug = ref<string | null>(null)
 function openJourney(slug: string) {
   selectedJourneySlug.value = slug
 }
@@ -15,28 +17,26 @@ function closeJourney() {
   selectedJourneySlug.value = null
 }
 
-const STRAPI_URL = 'http://8.137.176.118:1337' // 确保这是你的正确 IP
+// 2. --- (修复!) 恢复你原来的 handleCardClick ---
+// (这个函数只处理 *动画* 的点击, 不打开模态框)
+const handleCardClick = (index: number) => {
+  console.log(`Card ${index} clicked (this is the swap animation click)`);
+};
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+
+// ( 接口 和 Refs - 保持不变 )
 interface Journey {
-  id: number
-  title: string
-  slug: string
-  date: string
-  coverImageUrl: string
+  id: number, title: string, slug: string, date: string, coverImageUrl: string
 }
 const journeys = ref<Journey[]>([])
 const isLoading = ref(true)
 
-// (onMounted 函数保持不变)
+// ( onMounted 函数 - 保持不变 )
 onMounted(async () => {
   isLoading.value = true
   try {
-    const response = await axios.get(`${STRAPI_URL}/api/journeys`, {
-      params: {
-        'populate': 'cover_image',
-        'sort': 'date:desc'
-      }
-    })
+    const response = await getJourneys()
     const strapiData = response.data.data
     const dataArray = strapiData || [] 
     journeys.value = dataArray.map((item: any) => {
@@ -45,8 +45,8 @@ onMounted(async () => {
         id: item.id,
         title: item.title,
         slug: item.slug,
-        date: new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-        coverImageUrl: `${STRAPI_URL}${item.cover_image.url}`
+        date: new Date(item.date).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', 'day': 'numeric' }),
+        coverImageUrl: `${API_BASE_URL}${item.cover_image.url}`
       }
     }).filter((item: Journey | null) => item !== null)
   } catch (error: any) {
@@ -59,55 +59,94 @@ onMounted(async () => {
   }
 })
 </script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <template>
-  <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
-    
-    <h1 class="text-3xl font-semibold mb-2">CLIENTS</h1>
-    <p class="mb-12 text-gray-300">
-      Impress your clients by easily creating an album site that they'll love.
-    </p>
+  <div class="z-0 absolute fixed inset-0">
+    <Aurora
+      :color-stops="['#F5F5F7', '#f3ecde', '#f3ecde']"
+      :amplitude="1.0"
+      :blend="0.5"
+      :speed="1.0"
+      :intensity="1.0"
+      class="w-full h-full"
+    />
+  </div>
 
+  <div class="relative w-full overflow-x-hidden">
+  
+  <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
+  
+    <div class="text-black text-4xl font-serif text-left ml-10 mb-10">
+      <TextGenerateEffect
+        words="Our Story begins here..."
+      />
+    </div>
+    
     <div v-if="isLoading" class="text-center text-gray-400">
       加载中...
     </div>
-
-    <div v-if="!isLoading && journeys.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div 
-        v-for="journey in journeys" 
-        :key="journey.id"
-        @click="openJourney(journey.slug)"
-        class="block group relative overflow-hidden shadow-lg cursor-pointer"
-      >
-        <div class="aspect-[3/4] relative">
-          <img 
-            :src="journey.coverImageUrl" 
-            :alt="journey.title" 
-            class="absolute inset-0 w-full h-full object-cover 
-                   transition-transform duration-500 ease-in-out group-hover:scale-105"
-          />
-          <div 
-            class="absolute inset-0 bg-gradient-to-t from-transparent to-black/70 
-                   transition-opacity duration-300 group-hover:opacity-0"
-          ></div>
-          <div 
-            class="absolute top-0 left-0 right-0 p-4 text-white 
-                   transition-opacity duration-300 group-hover:opacity-0"
-          >
-            <h2 class="text-xl font-semibold">{{ journey.title }}</h2>
-            <p class="text-sm text-gray-200">{{ journey.date }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
+    
     <div v-if="!isLoading && journeys.length === 0" class="text-center text-gray-400">
       未找到 'journey' 分类的图片。
       <br />
       请确保你已在 Strapi 中上传并**发布**了图片。
     </div>
-  </div>
+  <div class="flex flex-col lg:flex-row justify-between items-start gap-20"> 
+    <div class="w-full lg:w-5/12 text-white mix-blend-difference">
+      <TextType
+        :text="['有一个想法，安慰着我：\n不管走到天涯海角，\n我离她都不会更远了。']"
+        :typingSpeed="75"
+        :as="'p'"
+        :pauseDuration="1500"
+        :showCursor="true"
+        :loop="true"
+        cursorCharacter="|"
+        :class-name="'text-3xl text-left tracking-wide leading-relaxed relative mt-24 lg:absolute'"
+      />
+    </div>
+    <div v-if="!isLoading && journeys.length > 0">
+      
+      <div class="w-full relative lg:w-7/12 flex justify-left md:ml-80 lg:block">
 
+        <div class="relative h-[400px] mt-36 
+                    lg:translate-x-16">
+          <CardSwap
+            :total-cards="journeys.length"
+            :pause-on-hover="false"
+            :width="550"  
+            :height="300"
+            :className="'bg-transparent border-none overflow-hidden '"
+            @card-click="handleCardClick"
+          >
+            <template
+              v-for="(journey, index) in journeys"
+              :key="journey.id"
+              v-slot:[`card-${index}`]
+            >
+              <div class="m-2 flex items-center">
+                <i class="pi pi-circle-fill mr-2"></i>
+                <span>{{ journey.title }} 于 {{ journey.date }}</span>
+              </div>
+              <div
+                @click.stop="openJourney(journey.slug)"
+                class="relative w-full h-full overflow-hidden cursor-pointer group"
+              >
+                <img
+                  :src="journey.coverImageUrl"
+                  :alt="journey.title"
+                  class="absolute inset-0 w-300 h-full"
+                />
+              </div>
+            </template>
+          </CardSwap>
+        </div>
+      </div>
+    </div>
+  </div> 
+  </div>
+  </div>
+  
   <Transition
     enter-active-class="transition-opacity duration-300 ease-out"
     enter-from-class="opacity-0"
@@ -119,7 +158,7 @@ onMounted(async () => {
     <div
       v-if="selectedJourneySlug"
       @click="closeJourney"
-      class="fixed inset-0 z-40 flex items-center justify-center bg-black/80 p-4"
+      class="fixed backdrop-blur-lg inset-0 z-90 flex items-center justify-center "
     >
       <Transition
         appear
@@ -132,13 +171,13 @@ onMounted(async () => {
       >
         <div 
           @click.stop 
-          class="relative w-full max-w-5xl h-[90vh] bg-zinc-900 rounded-lg shadow-xl flex flex-col"
+          class="relative w-full h-full  back-blur-lg rounded-lg shadow-xl flex flex-col"
         >
           <button 
             @click="closeJourney" 
-            class="absolute top-3 right-3 z-50 p-1 rounded-full text-gray-400 hover:text-white hover:bg-zinc-700 transition-colors"
+            class="absolute top-8 right-8 z-50 p-1 rounded-full text-white hover:text-white hover:bg-zinc-600 transition-colors"
           >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
@@ -152,6 +191,7 @@ onMounted(async () => {
           </div>
         </div>
       </Transition>
-    </div>
+</div>
   </Transition>
+  
 </template>

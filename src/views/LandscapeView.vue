@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import MasonryWall from '@yeger/vue-masonry-wall'
-import axios from 'axios'
+import { getPhotosByCategory } from '@/api/contentService'
+import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue'
+import GradientText from '@/components/TextAnimations/GradientText/GradientText.vue'
+import DecryptedText from '@/components/TextAnimations/DecryptedText/DecryptedText.vue'
+import TextGenerateEffect from '@/components/ui/text-generate-effect/TextGenerateEffect.vue'
 
 // 你的 Strapi 服务器地址
-const STRAPI_URL = 'http://8.137.176.118:1337'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 interface ImageItem {
   id: number
@@ -28,13 +32,7 @@ function closeImage() {
 onMounted(async () => {
   isLoading.value = true
   try {
-    const response = await axios.get(`${STRAPI_URL}/api/photos`, {
-      params: {
-        'populate': 'image',
-        // *** 修改这里的 category ***
-        'filters[category][$eq]': 'landscape' // <-- 从 'documentary' 改为 'landscape'
-      }
-    })
+    const response = await getPhotosByCategory('landscape')
 
     const strapiData = response.data.data
     
@@ -45,7 +43,7 @@ onMounted(async () => {
       
       return {
         id: item.id,
-        src: `${STRAPI_URL}${item.image.url}`, 
+        src: `${API_BASE_URL}${item.image.url}`, 
         alt: item.alt, 
         liked: false
       }
@@ -100,12 +98,30 @@ async function shareImage(event: Event, src: string, alt: string) {
 </script>
 
 <template>
-  <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
+  <div class="z-0 absolute fixed inset-0">
+    <Aurora
+      :color-stops="['#F5F5F7', '#f3ecde', '#F5F5F7']"
+      :amplitude="1.0"
+      :blend="0.5"
+      :speed="1.0"
+      :intensity="1.0"
+      class="w-full h-full"
+    />
+  </div>
+  <div class=" relative pt-36 px-8 pb-24 text-white max-w-5xl mx-auto">
     
-    <h1 class="text-3xl font-semibold mb-6">LANDSCAPE</h1>
-    <p class="mb-12 text-gray-300">
-      这里是风景摄影页面的描述文字。
-    </p>
+
+    <div class="text-black text-4xl font-serif text-center">Stunning Landscape Gallery</div>
+
+      <!-- 两行字 -->
+      <div class="mb-10 mt-2">
+          <TextGenerateEffect
+          class="text-white mix-blend-difference"
+          words="这片疆域上的人们，对土地都有一种迷恋。在《飘 》里面，郝斯嘉的父亲对她说过这样的话：孩子,这世界上没有什么东西值得你为之拼命和流血，
+除了土地。"
+          />
+      </div>
+
 
     <div v-if="isLoading" class="text-center text-gray-400">
       从 Strapi 加载中...
@@ -137,7 +153,7 @@ async function shareImage(event: Event, src: string, alt: string) {
           <img :src="item.src" :alt="item.alt" class="w-full h-auto block" />
           <div 
             class="absolute bottom-0 left-0 right-0 p-4 
-                   bg-gradient-to-t from-black/60 to-transparent
+                   bg-linear-to-t from-black/60 to-transparent
                    flex justify-between items-center
                    opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"
           >
