@@ -81,7 +81,7 @@ onMounted(() => {
 <template>
   <div class="pt-48 px-8 pb-24 text-white max-w-5xl mx-auto">
     
-    <h1 class="text-3xl font-semibold mb-4 mix-blend-difference">CLIENT SHOWCASE</h1>
+    <h1 class="text-3xl font-serif font-semibold mb-4 mix-blend-difference">Some Articles</h1>
     <div v-if="!isSearchActive" class="flex justify-between items-center border-b border-gray-700 pb-4 mb-12">
       <span class="text-lg mix-blend-difference">All Posts</span>
       <button @click="isSearchActive = true" class="text-gray-400 hover:text-white">

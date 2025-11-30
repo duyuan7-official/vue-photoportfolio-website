@@ -37,8 +37,8 @@ const navConfig = {
             DuYuan
           </span>
         <div class="flex items-center -mt-2 pl-[2px] text-white/90 group-hover:text-white transition-colors">
-          <div class="w-12 h-[1px] mt-1 bg-white/80 group-hover:bg-white transition-colors"></div>
-          <span class="text-[20px] md:text-[16px] font-serif font-light mt-1 pl-[4px] text-black group-hover:text-white transition-colors">
+          <div class="w-12 h-[1px] mt-1 bg-white mix-blend-difference group-hover:bg-white transition-colors"></div>
+          <span class="text-[20px] md:text-[16px] font-serif font-light mt-1 pl-[4px] text-black transition-colors">
             Photography
           </span>
         </div>

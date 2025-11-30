@@ -5,6 +5,7 @@ import JourneyGallery from '@/components/JourneyGallery.vue'
 // 1. --- (导入 CardSwap - 保持不变) ---
 import CardSwap from '@/components/Components/CardSwap/CardSwap.vue'
 import TextType from '@/components/TextAnimations/TextType/TextType.vue'
+import TextGenerateEffect from '@/components/ui/text-generate-effect/TextGenerateEffect.vue'
 import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue'
 
 // ( selectedJourneySlug, openJourney, closeJourney - 保持不变 )
@@ -63,7 +64,7 @@ onMounted(async () => {
 <template>
   <div class="z-0 absolute fixed inset-0">
     <Aurora
-      :color-stops="['#F5F5F7', '#E6E6EB', '#E7CEFF']"
+      :color-stops="['#F5F5F7', '#f3ecde', '#f3ecde']"
       :amplitude="1.0"
       :blend="0.5"
       :speed="1.0"
@@ -75,6 +76,12 @@ onMounted(async () => {
   <div class="relative w-full overflow-x-hidden">
   
   <div class="pt-32 px-8 pb-24 text-white max-w-5xl mx-auto">
+  
+    <div class="text-black text-4xl font-serif text-left ml-10 mb-10">
+      <TextGenerateEffect
+        words="Our Story begins here..."
+      />
+    </div>
     
     <div v-if="isLoading" class="text-center text-gray-400">
       加载中...
@@ -85,23 +92,22 @@ onMounted(async () => {
       <br />
       请确保你已在 Strapi 中上传并**发布**了图片。
     </div>
-
-    <div v-if="!isLoading && journeys.length > 0" class="flex flex-col lg:flex-row justify-between items-start gap-8">
+  <div class="flex flex-col lg:flex-row justify-between items-start gap-20"> 
+    <div class="w-full lg:w-5/12 text-white mix-blend-difference">
+      <TextType
+        :text="['有一个想法，安慰着我：\n不管走到天涯海角，\n我离她都不会更远了。']"
+        :typingSpeed="75"
+        :as="'p'"
+        :pauseDuration="1500"
+        :showCursor="true"
+        :loop="true"
+        cursorCharacter="|"
+        :class-name="'text-3xl text-left tracking-wide leading-relaxed relative mt-24 lg:absolute'"
+      />
+    </div>
+    <div v-if="!isLoading && journeys.length > 0">
       
-      <div class="w-full lg:w-5/12 text-white mix-blend-difference">
-        <TextType
-          :text="['有一个想法，安慰着我：\n不管走到天涯海角，\n我离她都不会更远了。']"
-          :typingSpeed="75"
-          :as="'p'"
-          :pauseDuration="1500"
-          :showCursor="true"
-          :loop="true"
-          cursorCharacter="|"
-          :class-name="'text-3xl text-left tracking-wide leading-relaxed relative mt-24 lg:absolute'"
-        />
-      </div>
-
-      <div class="w-full relative lg:w-7/12 flex justify-center lg:block">
+      <div class="w-full relative lg:w-7/12 flex justify-left md:ml-80 lg:block">
 
         <div class="relative h-[400px] mt-36 
                     lg:translate-x-16">
@@ -137,7 +143,7 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-    
+  </div> 
   </div>
   </div>
   

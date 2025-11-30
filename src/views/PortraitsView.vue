@@ -106,7 +106,7 @@ async function shareImage(event: Event, src: string, alt: string) {
 <template>
   <div class="z-0 absolute fixed inset-0">
     <Aurora
-      :color-stops="['#F5F5F7', '#E6E6EB', '#E7CEFF']"
+      :color-stops="['#F5F5F7', '#f3ecde', '#F5F5F7']"
       :amplitude="1.0"
       :blend="0.5"
       :speed="1.0"

@@ -100,7 +100,7 @@ async function shareImage(event: Event, src: string, alt: string) {
 <template>
   <div class="z-0 absolute fixed inset-0">
     <Aurora
-      :color-stops="['#F5F5F7', '#E6E6EB', '#E7CEFF']"
+      :color-stops="['#F5F5F7', '#f3ecde', '#F5F5F7']"
       :amplitude="1.0"
       :blend="0.5"
       :speed="1.0"
@@ -110,27 +110,18 @@ async function shareImage(event: Event, src: string, alt: string) {
   </div>
   <div class=" relative pt-36 px-8 pb-24 text-white max-w-5xl mx-auto">
     
-    <div class="flex items-start mb-8">
-      <!-- 竖线装饰 -->
-      <div class="w-1 h-28 bg-gray-300 rounded-full mr-5 shrink-0"></div>
+
+    <div class="text-black text-4xl font-serif text-center">Stunning Landscape Gallery</div>
 
       <!-- 两行字 -->
-      <div>
-        <GradientText
-          text="LandScpae"
-          :animation-speed="5"
-          :show-border="false"
-          :colors="['#12c2e9', '#c471ed','#f64f59']"
-          class="text-4xl font-semibold mb-2 ml-0"
-        />
+      <div class="mb-10 mt-2">
           <TextGenerateEffect
           class="text-white mix-blend-difference"
-          words="这片疆域上的人们，对土地都有一种迷恋。在《飘 》里面，
-郝斯嘉的父亲对她说过这样的话：孩子,这世界上没有什么东西值得你为之拼命和流血，
+          words="这片疆域上的人们，对土地都有一种迷恋。在《飘 》里面，郝斯嘉的父亲对她说过这样的话：孩子,这世界上没有什么东西值得你为之拼命和流血，
 除了土地。"
           />
       </div>
-    </div>
+
 
     <div v-if="isLoading" class="text-center text-gray-400">
       从 Strapi 加载中...
