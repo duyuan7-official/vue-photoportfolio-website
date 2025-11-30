@@ -7,7 +7,7 @@
 
 
 <template>
-  <div class="fixed absolute bg-transparent bottom-0 left-0 right-0 p-8 text-gray-400 z-100">
+  <div class="fixed absolute bg-transparent bottom-0 left-0 right-0 p-8 text-white mix-blend-difference z-100">
     <div class="container max-w-5xl mx-auto flex justify-between items-center text-xs">
       
       <p class="text-gray-500">

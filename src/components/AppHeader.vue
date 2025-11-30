@@ -1,59 +1,64 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
-// 1. --- (新增) 导入 useRoute ---
-import { useRoute } from 'vue-router'
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import PillNav from '@/components/Components/PillNav/PillNav.vue';
 
-// 2. --- (新增) 获取当前路由信息 ---
-const route = useRoute()
+const route = useRoute();
+const currentPath = computed(() => route.path);
+
+const navItems = [
+  { label: 'Home', href: '/' },
+  { label: 'About', href: '/about' },
+  { label: 'Portraits', href: '/portraits' },
+  { label: 'Landscape', href: '/landscape' },
+  { label: 'Journey', href: '/journey' },
+  { label: 'Article', href: '/article' },
+];
+
+const navConfig = {
+  baseColor: 'rgba(255, 255, 255, 0.10)',
+  pillColor: '#ffffff',
+  pillTextColor: '#1f2937',
+  hoveredPillTextColor: '#1f2937',
+  logo: '/logo.png',
+};
 </script>
 
 <template>
-  <header class="absolute top-0 left-0 right-0 z-80 p-8 text-white backdrop-blur-lg drop-shadow-lg">
-    <div class="container max-w-4xl mx-auto flex items-center">
-      
-      <RouterLink to="/" class="shrink-0 mr-3 text-right">
-        <span class="block font-semibold text-3xl tracking-normal">Du Yuan</span>
-        <span class="block font-normal text-lg tracking-widest">PHOTOGRAPHY</span>
-      </RouterLink>
+  <header class="absolute top-0 left-0 right-0 z-50 pointer-events-none mx-auto">
+    <div class="flex flex-col w-full">
+      <div class="flex items-center justify-between px-6 py-5 md:px-24 pointer-events-auto">
+        
+        <RouterLink 
+          to="/" 
+          class="flex flex-col md:pl-46 z-50 select-none mix-blend-difference text-black hover:opacity-80 transition-opacity group"
+        >
+          <span class="text-4xl font-normal tracking-widest font-serif mix-blend-difference leading-none">
+            DuYuan
+          </span>
+        <div class="flex items-center -mt-2 pl-[2px] text-white/90 group-hover:text-white transition-colors">
+          <div class="w-12 h-[1px] mt-1 bg-white mix-blend-difference group-hover:bg-white transition-colors"></div>
+          <span class="text-[20px] md:text-[16px] font-serif font-light mt-1 pl-[4px] text-black transition-colors">
+            Photography
+          </span>
+        </div>
+        </RouterLink>
 
-      <div class="h-12 border-l-2 border-white/75"></div>
+        <div class="flex-shrink-0">
+          <PillNav
+            :items="navItems"
+            :logo="navConfig.logo"
+            logo-alt="Du Yuan Photography"
+            :active-href="currentPath"
+            :base-color="navConfig.baseColor"
+            :pill-color="navConfig.pillColor"
+            :pill-text-color="navConfig.pillTextColor"
+            :hovered-pill-text-color="navConfig.hoveredPillTextColor"
+          />
+        </div>
+      </div>
 
-      <nav class="flex-1 ml-6">
-        <ul class="flex space-x-4">
-          
-          <li class="flex-1 text-center transition-opacity duration-300 hover:opacity-50 group">
-            <div class="h-0.5 bg-white mb-1 transition-all duration-300 group-hover:h-px"></div>
-            <RouterLink to="/" class="uppercase text-xs tracking-widest">Home</RouterLink>
-          </li>
-          
-          <li class="flex-1 text-center transition-opacity duration-300 hover:opacity-50 group">
-            <div class="h-0.5 bg-white mb-1 transition-all duration-300 group-hover:h-px"></div>
-            <RouterLink to="/about" class="uppercase text-xs tracking-widest">About</RouterLink>
-          </li>
-          
-          <li class="flex-1 text-center transition-opacity duration-300 hover:opacity-50 group">
-            <div class="h-0.5 bg-white mb-1 transition-all duration-300 group-hover:h-px"></div>
-            <RouterLink to="/portraits" class="uppercase text-xs tracking-widest">Portraits</RouterLink>
-          </li>
-          
-          <li class="flex-1 text-center transition-opacity duration-300 hover:opacity-50 group">
-            <div class="h-0.5 bg-white mb-1 transition-all duration-300 group-hover:h-px"></div>
-            <RouterLink to="/landscape" class="uppercase text-xs tracking-widest">Landscape</RouterLink>
-          </li>
-          
-          <li class="flex-1 text-center transition-opacity duration-300 hover:opacity-50 group">
-            <div class="h-0.5 bg-white mb-1 transition-all duration-300 group-hover:h-px"></div>
-            <RouterLink to="/journey" class="uppercase text-xs tracking-widest">Journey</RouterLink>
-          </li>
-          
-          <li class="flex-1 text-center transition-opacity duration-300 hover:opacity-50 group">
-            <div class="h-0.5 bg-white mb-1 transition-all duration-300 group-hover:h-px"></div>
-            <RouterLink to="/article" class="uppercase text-xs tracking-widest">Article</RouterLink>
-          </li>
-          
-        </ul>
-      </nav>
-
+      <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
     </div>
   </header>
 </template>

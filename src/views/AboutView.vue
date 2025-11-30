@@ -9,7 +9,7 @@
 <template>
   <div class="z-0 absolute fixed inset-0">
     <Aurora
-      :color-stops="['#7cff67', '#171D22', '#7cff67']"
+      :color-stops="['#F5F5F7', '#E6E6EB', '#E7CEFF']"
       :amplitude="1.0"
       :blend="0.5"
       :speed="1.0"
@@ -17,7 +17,7 @@
       class="w-full h-full"
     />
   </div>
-  <div class="pt-40 px-8 pb-24 text-white max-w-5xl mx-auto relative">
+  <div class="pt-40 px-8 pb-24 text-white mix-blend-difference max-w-5xl mx-auto relative">
     
     <div class="pt-2 text-sm mb-6 justify-left flex font-thin">
       <TrueFocus

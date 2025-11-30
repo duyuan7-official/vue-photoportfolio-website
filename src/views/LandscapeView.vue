@@ -3,6 +3,9 @@ import { ref, onMounted } from 'vue'
 import MasonryWall from '@yeger/vue-masonry-wall'
 import { getPhotosByCategory } from '@/api/contentService'
 import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue'
+import GradientText from '@/components/TextAnimations/GradientText/GradientText.vue'
+import DecryptedText from '@/components/TextAnimations/DecryptedText/DecryptedText.vue'
+import TextGenerateEffect from '@/components/ui/text-generate-effect/TextGenerateEffect.vue'
 
 // 你的 Strapi 服务器地址
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -97,7 +100,7 @@ async function shareImage(event: Event, src: string, alt: string) {
 <template>
   <div class="z-0 absolute fixed inset-0">
     <Aurora
-      :color-stops="['#7cff67', '#171D22', '#7cff67']"
+      :color-stops="['#F5F5F7', '#f3ecde', '#F5F5F7']"
       :amplitude="1.0"
       :blend="0.5"
       :speed="1.0"
@@ -107,10 +110,18 @@ async function shareImage(event: Event, src: string, alt: string) {
   </div>
   <div class=" relative pt-36 px-8 pb-24 text-white max-w-5xl mx-auto">
     
-    <h1 class="text-3xl font-semibold mb-6">LANDSCAPE</h1>
-    <p class="mb-12 text-gray-300">
-      这里是风景摄影页面的描述文字。
-    </p>
+
+    <div class="text-black text-4xl font-serif text-center">Stunning Landscape Gallery</div>
+
+      <!-- 两行字 -->
+      <div class="mb-10 mt-2">
+          <TextGenerateEffect
+          class="text-white mix-blend-difference"
+          words="这片疆域上的人们，对土地都有一种迷恋。在《飘 》里面，郝斯嘉的父亲对她说过这样的话：孩子,这世界上没有什么东西值得你为之拼命和流血，
+除了土地。"
+          />
+      </div>
+
 
     <div v-if="isLoading" class="text-center text-gray-400">
       从 Strapi 加载中...

@@ -2,7 +2,10 @@
 import { ref, onMounted } from 'vue'
 import MasonryWall from '@yeger/vue-masonry-wall'
 import Aurora from '@/components/Backgrounds/Aurora/Aurora.vue'
+import GradientText from '@/components/TextAnimations/GradientText/GradientText.vue'
 import { getPhotosByCategory } from '@/api/contentService'
+import TextGenerateEffect from '@/components/ui/text-generate-effect/TextGenerateEffect.vue'
+import TextType from '@/components/TextAnimations/TextType/TextType.vue'
 
 // 1. 你的 Strapi 服务器地址 (不变)
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -103,7 +106,7 @@ async function shareImage(event: Event, src: string, alt: string) {
 <template>
   <div class="z-0 absolute fixed inset-0">
     <Aurora
-      :color-stops="['#7cff67', '#171D22', '#7cff67']"
+      :color-stops="['#F5F5F7', '#f3ecde', '#F5F5F7']"
       :amplitude="1.0"
       :blend="0.5"
       :speed="1.0"
@@ -113,10 +116,14 @@ async function shareImage(event: Event, src: string, alt: string) {
   </div>
   <div class="relative z-10">
     <div class="pt-36 px-8 pb-24 text-white max-w-5xl mx-auto">
-      <h1 class="text-3xl font-semibold mb-6 ">PORTRAITS</h1>
-      <p class="mb-12 text-gray-300">
-        人像摄影作品集。点击图片查看大图，喜欢的话可以点赞、下载或分享给朋友！
-      </p>
+      <div class="text-black mix-blend-difference text-4xl font-serif text-center">Elegant Portrait Gallery</div>
+      <!-- 两行字 -->
+        <div class="mb-10 mt-2 text-center">
+          <TextGenerateEffect
+          :class="'text-black mix-blend-difference text-center'"
+          words="人像摄影不仅仅是捕捉一个人的外貌，更是捕捉他们的灵魂和故事。每一张人像照片都讲述着一个独特的故事，展现出被摄者的个性、情感和内在世界。"
+          />
+        </div>
 
       <div v-if="isLoading" class="text-center text-gray-400">
         从 Strapi 加载中...
