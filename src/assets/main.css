@@ -37,7 +37,7 @@ body {
 
 
 @theme {
-  --font-serif: "Playfair Display", ui-serif;
+  --font-serif: "PlayfairDisplay", ui-serif;
 }
 
 :root {
@@ -112,7 +112,7 @@ body {
 }
 
 @theme inline {
-  --font-serif: "Playfair Display", ui-serif;
+  --font-serif: "PlayfairDisplay", ui-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -174,8 +174,8 @@ body {
   }
 
   @font-face {
-    font-family: "Playfair Display";
-    src: url(fonts/PlayfairDisplay-VariableFont_wght.ttf)format("truetype");
+    font-family: "PlayfairDisplay";
+    src: url("/fonts/PlayfairDisplay-VF.ttf")format("truetype");
     font-weight: 200 900;
     font-style: normal;
   }
